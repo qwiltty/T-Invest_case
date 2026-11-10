@@ -1,0 +1,6 @@
+# T-Invest Portfolio Copilot Requirements
+# Note: Core prototype (prototype/portfolio_auditor.py) has 0 external dependencies (runs on pure Python 3.10+ standard library).
+
+# Optional libraries for building PDF reports:
+reportlab>=4.0.0
+pymupdf>=1.23.0
