@@ -13,7 +13,7 @@
 
 ---
 
-## 📑 Ключевые материалы для экспертного жюри
+## Ключевые материалы для экспертного жюри
 
 | Документ / Компонент | Описание | Формат |
 |:---|:---|:---:|
@@ -27,7 +27,7 @@
 
 ---
 
-## 🚀 Ключевые возможности системы VIRA
+## Ключевые возможности системы VIRA
 
 1. **Непрерывный мониторинг инвестиционного тезиса:**
    - Извлечение скрытых рисков из неструктурированных сносок МСФО/РСБУ и ленты раскрытий `e-disclosure.ru` (плавающий долг при жесткой ДКП, ковенанты, судебные иски, сжатие свободного денежного потока FCF) за 2–4 недели до их дисконтирования рынком.
@@ -49,7 +49,7 @@
 
 ---
 
-## 🖼️ Пользовательский интерфейс (3 связанных экрана)
+## Пользовательский интерфейс (3 связанных экрана)
 
 Система VIRA предоставляет целостный веб-интерфейс, спроектированный по дизайн-системе Т-Инвестиций:
 
@@ -65,7 +65,7 @@
 
 ---
 
-## 🏛️ Системная архитектура
+## Системная архитектура
 
 Архитектура системы VIRA разделена на два изолированных контура:
 - **Контур А (Асинхронный фоновый конвейер подготовки знаний и моделей):** парсинг сложных PDF-отчётов МСФО, классификация источников новостей по уровням доверия, гибридный RAG-индекс (BM25 + BGE-M3 Dense + Cross-Encoder) и граф косвенных связей эмитентов.
@@ -115,7 +115,7 @@ flowchart TB
 
 ---
 
-## ⚡ Быстрый старт (Zero-Dependency)
+## Быстрый старт (Zero-Dependency)
 
 Проект написан на стандартной библиотеке Python 3.10+ и **не требует установки внешних библиотек** для запуска сервера, интерфейса, MCP и тестов:
 
@@ -146,7 +146,7 @@ python prototype/portfolio_auditor.py
 
 ---
 
-## 🛠️ Сервер Model Context Protocol (MCP)
+## Сервер Model Context Protocol (MCP)
 
 В систему встроен сервер протокола MCP (`vira/mcp_tools.py`), предоставляющий 7 готовых инструментов:
 
@@ -162,7 +162,7 @@ python prototype/portfolio_auditor.py
 
 ---
 
-## 📊 Результаты исследования и юнит-экономика
+## Результаты исследования и юнит-экономика
 
 ### 1. Эмпирический бэктест на данных MOEX (2022–2024 гг.)
 Детальный исследовательский отчёт представлен в [`docs/research.md`](docs/research.md):
@@ -179,62 +179,66 @@ python prototype/portfolio_auditor.py
 
 ---
 
-## 📁 Структура репозитория
+## Структура репозитория
 
 ```
 t_invest/
-├── VIRA_Jury_Technical_Report.pdf   # Итоговый технический отчёт для жюри (PDF)
-├── VIRA_Jury_Work_Report.pdf        # Итоговый отчёт о проделанной работе (PDF)
-├── README.md                        # Главный документ проекта с полным описанием
-├── requirements.txt                 # Зависимости (0 обязательных внешних библиотек)
-├── LICENSE                          # Лицензия MIT
+├── VIRA_Jury_Technical_Report.pdf
+├── VIRA_Jury_Work_Report.pdf
+├── README.md
+├── requirements.txt
+├── LICENSE
 │
-├── vira/                            # Продакшн-ядро системы VIRA
-│   ├── web/                         # Интерактивный 3-экранный веб-интерфейс
-│   │   ├── index.html               # Разметка интерфейса (3 связанных экрана)
-│   │   ├── style.css                # Стили дизайн-системы Т-Инвестиций
-│   │   ├── app.js                   # Клиентская логика, What-If симулятор, фильтры
-│   │   └── risk-illustration.png    # Графические иллюстрации
-│   ├── engine.py                    # Детерминированный математический движок (Decimal)
-│   ├── news_ingestor.py             # Живой сборщик новостей (ЦБ РФ, Интерфакс, РБК)
-│   ├── mcp_tools.py                 # Сервер протокола MCP (JSON-RPC 2.0, 7 инструментов)
-│   ├── server.py                    # HTTP REST сервер (Zero-Dependency)
-│   ├── agent.py                     # Агент объяснений и числовой цензор Guardrail
-│   ├── service.py                   # Сервисный фасад приложения
-│   ├── models.py                    # Модели данных портфеля и сценариев
-│   └── __main__.py                  # CLI точка входа (python -m vira)
+├── vira/
+│   ├── web/
+│   │   ├── index.html
+│   │   ├── style.css
+│   │   ├── app.js
+│   │   └── risk-illustration.png
+│   ├── engine.py
+│   ├── news_ingestor.py
+│   ├── mcp_tools.py
+│   ├── server.py
+│   ├── agent.py
+│   ├── service.py
+│   ├── models.py
+│   └── __main__.py
 │
 ├── solution/
-│   └── diagnostic_answers.md        # Ответы на 12 задач диагностического задания отбора
+│   └── diagnostic_answers.md
 │
-├── tests/                           # Комплекс автоматических тестов (19 тестов)
-│   ├── test_vira_acceptance.py      # Приёмочные тесты сценариев и расчётов
-│   ├── test_news_ingestor.py        # Тесты живого сбора и фильтрации новостей
-│   └── test_vira_e2e.py             # Сквозные тесты REST API и веб-сервера
+├── tests/
+│   ├── test_vira_acceptance.py
+│   ├── test_news_ingestor.py
+│   └── test_vira_e2e.py
 │
-├── prototype/                       # Базовый прототип риск-аудитора
-│   ├── portfolio_auditor.py         # Консольный сценарий аудита
-│   └── test_auditor.py              # Модульные тесты ядра (8 тестов)
+├── prototype/
+│   ├── portfolio_auditor.py
+│   └── test_auditor.py
 │
-├── docs/                            # Полная проектная документация
-│   ├── VIRA_Jury_Technical_Report.md# Технический отчёт для жюри (Markdown)
-│   ├── VIRA_Jury_Technical_Report.pdf# Технический отчёт для жюри (PDF)
-│   ├── VIRA_Jury_Work_Report.md     # Отчёт о проделанной работе (Markdown)
-│   ├── VIRA_Jury_Work_Report.pdf    # Отчёт о проделанной работе (PDF)
-│   ├── VIRA_Architecture_and_System_Report.md # Системный отчёт об архитектуре
-│   ├── architecture.md              # Системная архитектура, C4-схемы, SLA
-│   ├── research.md                  # Эмпирический бэктест на MOEX, поведенческая база
-│   ├── unit_economics_and_calculations.md # Расчёты юнит-экономики и токеномики
-│   └── preview/                     # Скриншоты экранов для документации
+├── docs/
+│   ├── VIRA_Jury_Technical_Report.md
+│   ├── VIRA_Jury_Technical_Report.pdf
+│   ├── VIRA_Jury_Work_Report.md
+│   ├── VIRA_Jury_Work_Report.pdf
+│   ├── VIRA_Architecture_and_System_Report.md
+│   ├── architecture.md
+│   ├── research.md
+│   ├── unit_economics_and_calculations.md
+│   └── preview/
+│       ├── preview.png
+│       ├── preview-asset.png
+│       ├── preview-compare.png
+│       └── preview-mobile.png
 │
-└── scripts/                         # Утилиты генерации отчётов
-    ├── build_jury_work_report_pdf.py# Скрипт сборки PDF-отчёта о работе
-    ├── build_full_pdf_report.py     # Скрипт сборки полного PDF-отчёта
-    └── build_unit_economics_pdf.py  # Скрипт сборки PDF юнит-экономики
+└── scripts/
+    ├── build_jury_work_report_pdf.py
+    ├── build_full_pdf_report.py
+    └── build_unit_economics_pdf.py
 ```
 
 ---
 
-## ⚖️ Лицензия
+## Лицензия
 Проект распространяется под лицензией [MIT](LICENSE).
 Разработано для участия в отборе «Инвест. Премаркет» (Т-Банк / Т-Инвестиции).
