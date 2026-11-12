@@ -227,6 +227,7 @@ t_invest/
 │       └── preview-mobile.png
 │
 └── scripts/
+    ├── build_jury_work_report_pdf.py
     ├── build_full_pdf_report.py
     └── build_unit_economics_pdf.py
 ```
