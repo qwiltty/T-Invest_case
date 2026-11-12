@@ -17,8 +17,7 @@
 
 | Документ / Компонент | Описание | Формат |
 |:---|:---|:---:|
-| **[Технический отчёт для жюри](VIRA_Jury_Technical_Report.pdf)** | Исчерпывающий паспорт решения, математический базис, архитектура контуров, юнит-экономика и метрики | **[PDF](VIRA_Jury_Technical_Report.pdf)** / [Markdown](docs/VIRA_Jury_Technical_Report.md) |
-| **[Отчёт о проделанной работе](VIRA_Jury_Work_Report.pdf)** | Детальный отчёт по 4 этапам разработки, согласованные бизнес-правила и результаты испытаний | **[PDF](VIRA_Jury_Work_Report.pdf)** / [Markdown](docs/VIRA_Jury_Work_Report.md) |
+| **[Итоговый отчёт для жюри](VIRA_Report.pdf)** | Исчерпывающий научно-технический паспорт решения, этапы разработки, математический базис, архитектура, юнит-экономика и метрики | **[PDF](VIRA_Report.pdf)** / [Markdown](docs/VIRA_Report.md) |
 | **[Ответы на 12 задач отбора](solution/diagnostic_answers.md)** | Выверенные ответы на вопросы диагностического задания с соблюдением лимитов знаков | [Markdown](solution/diagnostic_answers.md) |
 | **[Интерактивный веб-интерфейс](vira/web/index.html)** | 3 связанных экрана: «Прогноз портфеля», «Карточка бумаги» и «Сравнение вариантов» | [Открыть сайт](vira/web/index.html) |
 | **[Архитектура и схемы C4](docs/architecture.md)** | Детальная системная архитектура, gRPC/REST схемы и диаграммы взаимодействия | [Markdown](docs/architecture.md) |
@@ -183,8 +182,7 @@ python prototype/portfolio_auditor.py
 
 ```
 t_invest/
-├── VIRA_Jury_Technical_Report.pdf
-├── VIRA_Jury_Work_Report.pdf
+├── VIRA_Report.pdf
 ├── README.md
 ├── requirements.txt
 ├── LICENSE
@@ -217,11 +215,8 @@ t_invest/
 │   └── test_auditor.py
 │
 ├── docs/
-│   ├── VIRA_Jury_Technical_Report.md
-│   ├── VIRA_Jury_Technical_Report.pdf
-│   ├── VIRA_Jury_Work_Report.md
-│   ├── VIRA_Jury_Work_Report.pdf
-│   ├── VIRA_Architecture_and_System_Report.md
+│   ├── VIRA_Report.pdf
+│   ├── VIRA_Report.md
 │   ├── architecture.md
 │   ├── research.md
 │   ├── unit_economics_and_calculations.md
@@ -232,7 +227,6 @@ t_invest/
 │       └── preview-mobile.png
 │
 └── scripts/
-    ├── build_jury_work_report_pdf.py
     ├── build_full_pdf_report.py
     └── build_unit_economics_pdf.py
 ```
