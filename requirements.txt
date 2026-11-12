@@ -1,6 +1,8 @@
-# T-Invest Portfolio Copilot Requirements
-# Note: Core prototype (prototype/portfolio_auditor.py) has 0 external dependencies (runs on pure Python 3.10+ standard library).
-
-# Optional libraries for building PDF reports:
+# VIRA (Virtual Investing Researcher Agent) Requirements
+#
+# Core Engine, Web Server, MCP Server, REST API & Automated Tests have ZERO third-party dependencies!
+# Runs on pure Python 3.10+ standard library out-of-the-box.
+#
+# Optional dependencies for generating PDF reports from markdown:
 reportlab>=4.0.0
 pymupdf>=1.23.0
