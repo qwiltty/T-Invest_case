@@ -5,43 +5,21 @@
 [![Tests Passing](https://img.shields.io/badge/tests-27%20passed-brightgreen.svg)]()
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20external-success.svg)]()
 [![Compliance 39-FZ](https://img.shields.io/badge/Compliance-39--ФЗ%20ЦБ%20РФ-success.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[![Смотреть видео-трейлер VIRA](preview.png)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)
+
+<p align="center">
+  <a href="https://qwiltty.github.io/T-Invest_case/"><strong>🚀 Запустить интерактивный веб-прототип (Live Demo)</strong></a>
+  &nbsp;•&nbsp;
+  <a href="https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4"><strong>🎬 Смотреть видео-трейлер в браузере (MP4, 2 мин)</strong></a>
+  &nbsp;•&nbsp;
+  <a href="VIRA_Report.pdf"><strong>📄 Итоговый отчёт для жюри (PDF)</strong></a>
+</p>
 
 > **Проектное WealthTech-решение для экосистемы брокера Т-Инвестиции (Т-Банк / Московская биржа MOEX)**  
 > Разработано в рамках конкурсного отбора кейса «Инвест. Премаркет».  
 > Объединяет живой сбор новостей из официальных лент и деловых СМИ, гибридный RAG-анализ сносок МСФО, детерминированное математическое риск-ядро (`Decimal`), протокол MCP и интерактивный симулятор «Что, если?».
-
----
-
-## 🎬 Видео-демонстрация системы (Трейлер VIRA)
-https://github.com/qwiltty/T-Invest_case/issues/1
-
-[![Смотреть видео-трейлер VIRA](preview.png)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)
-
-> 📹 **[▶ Смотреть видео-трейлер VIRA онлайн в браузере (MP4, 2 мин)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)**  
-> 🌐 **[Открыть интерактивный сайт VIRA со встроенным видео](https://qwiltty.github.io/T-Invest_case/)** *(кнопка «▶ Видео-трейлер» в шапке сайта)*  
-> ⬇️ **[Скачать видеоролик напрямую (MP4, 26 МБ)](https://raw.githubusercontent.com/qwiltty/T-Invest_case/main/TRAILER_VIRA.mp4)**
-
-*В видеоролике наглядно продемонстрированы работа 3 связанных экранов интерфейса в дизайн-системе Т-Инвестиций, расчёт рисков портфеля на 21 день, анализ сносок отчётности эмитентов и сценарный What-If симулятор.*
-
----
-
-## 🌐 Интерактивный веб-прототип (Live Demo)
-
-Веб-интерфейс системы из 3 связанных экранов (версия дизайн-макета 1.7) полностью собран, развёрнут и доступен онлайн:
-
-- 🚀 **[Открыть работающий прототип онлайн (Live Demo на GitHub Pages)](https://qwiltty.github.io/T-Invest_case/)** *(открывается прямо в браузере как полноценный сайт)*
-- 🎬 **[Смотреть видео-трейлер прототипа онлайн](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)**
-
-**Варианты локального запуска:**
-1. **Напрямую в браузере (без сервера и без установки библиотек):**  
-   Откройте файл [`index.html`](index.html) в корне репозитория (или `vira/web/index.html`) в любом современном браузере. Трёхсценарный график на 21 день, списки предупреждений, карточки активов со стаканом, фильтрация новостей и What-If сравнение работают автономно с 0 зависимостей.
-2. **Через встроенный сервер Python с REST API и MCP:**  
-   Выполните в терминале команду:
-   ```bash
-   python -m vira --port 8000
-   ```
-   и перейдите на `http://localhost:8000` (работает на стандартной библиотеке Python 3.10+ с нулевыми зависимостями).
 
 ---
 
@@ -51,11 +29,26 @@ https://github.com/qwiltty/T-Invest_case/issues/1
 |:---|:---|:---:|
 | **[Итоговый отчёт для жюри](VIRA_Report.pdf)** | Исчерпывающий научно-технический паспорт решения, этапы разработки, математический базис, архитектура, юнит-экономика и метрики | **[PDF](VIRA_Report.pdf)** / [Markdown](docs/VIRA_Report.md) |
 | **[Ответы на 12 задач отбора](solution/diagnostic_answers.md)** | Выверенные ответы на вопросы диагностического задания с соблюдением лимитов знаков | [Markdown](solution/diagnostic_answers.md) |
-| **[Видео-трейлер решения](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)** | 2-минутная динамичная демонстрация работы веб-интерфейса и сценарного риск-ядра VIRA | **[Смотреть онлайн (MP4)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)** |
-| **[Интерактивный веб-интерфейс](https://qwiltty.github.io/T-Invest_case/)** | 3 связанных экрана: «Прогноз портфеля», «Карточка бумаги» и «Сравнение вариантов» | **[Открыть сайт онлайн (Live Demo)](https://qwiltty.github.io/T-Invest_case/)** |
 | **[Архитектура и схемы C4](docs/architecture.md)** | Детальная системная архитектура, gRPC/REST схемы и диаграммы взаимодействия | [Markdown](docs/architecture.md) |
 | **[Научное исследование и бэктест](docs/research.md)** | Эмпирическое исследование на MOEX (2022–2024 гг.), поведенческий анализ и 39-ФЗ | [Markdown](docs/research.md) |
 | **[Юнит-экономика и расчеты](docs/unit_economics_and_calculations.md)** | Расчет стоимости инференса, кэширования, окупаемости и ROI для Т-Банка (>3 000%) | [Markdown](docs/unit_economics_and_calculations.md) |
+| **[Дизайн-макет и критерии приёмки](docs/DESIGN.md)** | Спецификация макета v1.7 в дизайн-системе Т-Инвестиций и отчёт по гейтам тестирования | [DESIGN](docs/DESIGN.md) / [GATES](docs/GATES.md) |
+
+---
+
+## Пользовательский интерфейс (3 связанных экрана)
+
+Система VIRA предоставляет целостный веб-интерфейс, спроектированный по дизайн-системе Т-Инвестиций:
+
+| Экран 1: «Прогноз портфеля» | Экран 2: «Карточка бумаги» |
+|:---:|:---:|
+| ![Прогноз портфеля](docs/preview/preview.png) | ![Карточка бумаги](docs/preview/preview-asset.png) |
+| *Сводка рисков, 3 сценария на 21 день, контроль концентрации и список предупреждений* | *22-дневный график, предпосылки сценариев, стакан, проверенные новости и Click-to-Source* |
+
+| Экран 3: «Сравнение вариантов» | Мобильная адаптация |
+|:---:|:---:|
+| ![Сравнение вариантов](docs/preview/preview-compare.png) | ![Мобильная версия](docs/preview/preview-mobile.png) |
+| *What-If симулятор сделок, расчёт разницы до копейки и проверка лимитов риска* | *Адаптивный интерфейс для смартфонов и планшетов (320–1440 px)* |
 
 ---
 
@@ -78,22 +71,6 @@ https://github.com/qwiltty/T-Invest_case/issues/1
    - 7 программных инструментов для прямого взаимодействия с LLM-ассистентами (Claude Desktop, Cursor, внешние агенты) для аудита портфеля, симуляции сделок и проверки первоисточников.
 7. **Строгое соответствие законодательству (39-ФЗ):**
    - Решение функционирует как объективное аналитическое зеркало с проверяемыми цитатами (**Click-to-Source**), исключая признаки императивной индивидуальной инвестиционной рекомендации.
-
----
-
-## Пользовательский интерфейс (3 связанных экрана)
-
-Система VIRA предоставляет целостный веб-интерфейс, спроектированный по дизайн-системе Т-Инвестиций:
-
-| Экран 1: «Прогноз портфеля» | Экран 2: «Карточка бумаги» |
-|:---:|:---:|
-| ![Прогноз портфеля](docs/preview/preview.png) | ![Карточка бумаги](docs/preview/preview-asset.png) |
-| *Сводка рисков, 3 сценария на 21 день, контроль концентрации и список предупреждений* | *22-дневный график, предпосылки сценариев, стакан, проверенные новости и Click-to-Source* |
-
-| Экран 3: «Сравнение вариантов» | Мобильная адаптация |
-|:---:|:---:|
-| ![Сравнение вариантов](docs/preview/preview-compare.png) | ![Мобильная версия](docs/preview/preview-mobile.png) |
-| *What-If симулятор сделок, расчёт разницы до копейки и проверка лимитов риска* | *Адаптивный интерфейс для смартфонов и планшетов (320–1440 px)* |
 
 ---
 
@@ -159,7 +136,7 @@ python -m vira --port 8000
 После запуска откройте в браузере: `http://localhost:8000`
 
 ### 2. Запуск статического веб-сайта напрямую:
-Можно просто открыть файл [`vira/web/index.html`](vira/web/index.html) в любом браузере (Chrome, Safari, Edge, Firefox). Все интерактивные сценарии и What-If симулятор работают автономно.
+Откройте файл [`index.html`](index.html) (или [`vira/web/index.html`](vira/web/index.html)) в любом браузере (Chrome, Safari, Edge, Firefox). Все интерактивные сценарии и расчеты работают локально без сервера.
 
 ### 3. Запуск автоматических тестов (27 тестов):
 ```bash
@@ -215,52 +192,48 @@ python prototype/portfolio_auditor.py
 
 ```
 t_invest/
-├── index.html
-├── VIRA_Report.pdf
-├── README.md
-├── requirements.txt
-├── LICENSE
+├── index.html                   # Точка входа веб-приложения (Live Demo)
+├── style.css                    # Стили дизайн-системы Т-Инвестиций
+├── app.js                       # Интерактивное ядро интерфейса (3 экрана)
+├── TRAILER_VIRA.mp4             # Видео-демонстрация системы (26 МБ)
+├── VIRA_Report.pdf              # Итоговый отчёт для экспертного жюри
+├── README.md                    # Паспорт проекта и документация
+├── requirements.txt             # Зависимости (Zero External)
+├── LICENSE                      # Лицензия MIT
 │
-├── vira/
-│   ├── web/
-│   │   ├── index.html
-│   │   ├── style.css
-│   │   ├── app.js
-│   │   └── risk-illustration.png
-│   ├── engine.py
-│   ├── news_ingestor.py
-│   ├── mcp_tools.py
-│   ├── server.py
-│   ├── agent.py
-│   ├── service.py
-│   ├── models.py
-│   └── __main__.py
+├── vira/                        # Основной Python-пакет сервиса
+│   ├── web/                     # Статические файлы интерфейса
+│   ├── engine.py                # Детерминированное расчетное риск-ядро
+│   ├── news_ingestor.py         # 3-уровневый сборщик новостей
+│   ├── mcp_tools.py             # 7 инструментов протокола MCP
+│   ├── server.py                # Zero-dependency HTTP/REST сервер
+│   ├── agent.py                 # Логика формулирования объяснений
+│   ├── service.py               # Фасад бизнес-сервиса VIRA
+│   └── models.py                # Модели данных и валидация
 │
 ├── solution/
-│   └── diagnostic_answers.md
+│   └── diagnostic_answers.md    # Выверенные ответы на 12 задач отбора
 │
-├── tests/
+├── tests/                       # 19 сквозных и интеграционных тестов
 │   ├── test_vira_acceptance.py
 │   ├── test_news_ingestor.py
 │   └── test_vira_e2e.py
 │
-├── prototype/
+├── prototype/                   # Модуль первичного аудита портфеля (8 тестов)
 │   ├── portfolio_auditor.py
 │   └── test_auditor.py
 │
-├── docs/
+├── docs/                        # Научные и проектные материалы
 │   ├── VIRA_Report.pdf
 │   ├── VIRA_Report.md
 │   ├── architecture.md
 │   ├── research.md
 │   ├── unit_economics_and_calculations.md
-│   └── preview/
-│       ├── preview.png
-│       ├── preview-asset.png
-│       ├── preview-compare.png
-│       └── preview-mobile.png
+│   ├── DESIGN.md
+│   ├── GATES.md
+│   └── preview/                 # Скриншоты экранов интерфейса
 │
-└── scripts/
+└── scripts/                     # Скрипты компиляции отчетов
     ├── build_jury_work_report_pdf.py
     ├── build_full_pdf_report.py
     └── build_unit_economics_pdf.py
