@@ -1,3 +1,5 @@
+[Интерактивный веб-прототип (Live Demo)](https://qwiltty.github.io/T-Invest_case/) | [Видео-трейлер в браузере (MP4, 2 мин)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4) | [Итоговый отчёт для жюри (PDF)](VIRA_Report.pdf)
+
 # VIRA: Virtual Investing Researcher Agent
 ### Интеллектуальная система анализа портфельного риска, сценарного прогнозирования и проверки первоисточников в экосистеме Т-Инвестиций
 
@@ -6,16 +8,6 @@
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20external-success.svg)]()
 [![Compliance 39-FZ](https://img.shields.io/badge/Compliance-39--ФЗ%20ЦБ%20РФ-success.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[![Смотреть видео-трейлер VIRA](preview.png)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)
-
-<p align="center">
-  <a href="https://qwiltty.github.io/T-Invest_case/"><strong>🚀 Запустить интерактивный веб-прототип (Live Demo)</strong></a>
-  &nbsp;•&nbsp;
-  <a href="https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4"><strong>🎬 Смотреть видео-трейлер в браузере (MP4, 2 мин)</strong></a>
-  &nbsp;•&nbsp;
-  <a href="VIRA_Report.pdf"><strong>📄 Итоговый отчёт для жюри (PDF)</strong></a>
-</p>
 
 > **Проектное WealthTech-решение для экосистемы брокера Т-Инвестиции (Т-Банк / Московская биржа MOEX)**  
 > Разработано в рамках конкурсного отбора кейса «Инвест. Премаркет».  
