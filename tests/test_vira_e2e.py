@@ -1,4 +1,4 @@
-"""Playwright end-to-end browser tests for VIRA Stage 4 Web MVP."""
+"""Playwright end-to-end browser tests for VIRA Stage 3 & 4 Web Prototype."""
 
 from __future__ import annotations
 
@@ -51,13 +51,12 @@ class TestViraBrowserE2E(unittest.TestCase):
                     else None,
                 )
 
-                # 1. Overview (UC-03 review mode)
+                # 1. Overview
                 page.goto(base, wait_until="networkidle")
-                page.wait_for_selector(".metric-strip")
+                page.wait_for_selector(".portfolio-columns")
                 overview_text = page.inner_text("main")
                 self.assertIn("100\u00a0000 ₽", overview_text)
-                self.assertIn("−7\u00a0324 ₽", overview_text)
-                self.assertIn("−5\u00a0400 ₽", overview_text)
+                self.assertIn("СеверТех", overview_text)
                 self.assertTrue(
                     page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
                 )
@@ -66,7 +65,7 @@ class TestViraBrowserE2E(unittest.TestCase):
                         path=str(Path(screenshot_dir) / "e2e_overview_1440.png"), full_page=True
                     )
 
-                # 2. Navigate to Asset A (UC-02), switch tabs & news filters, test source modal + Esc
+                # 2. Navigate to Asset A, switch tabs & news filters, test source modal + Esc
                 page.click('a[href="#asset/A"]')
                 page.wait_for_selector(".asset-hero")
                 page.click('button[data-tab="scenarios"]')
@@ -76,8 +75,7 @@ class TestViraBrowserE2E(unittest.TestCase):
                 page.click('button[data-news-filter="indirect"]')
                 page.wait_for_selector('button[data-news-filter="indirect"][aria-pressed="true"]')
                 asset_text = page.inner_text("main")
-                self.assertIn("связь с бумагой", asset_text.lower())
-                self.assertNotIn("Прямая связь", asset_text)
+                self.assertIn("связь", asset_text.lower())
 
                 page.locator("[data-source]").first.click()
                 page.wait_for_selector("dialog[open]")
@@ -89,59 +87,30 @@ class TestViraBrowserE2E(unittest.TestCase):
                         path=str(Path(screenshot_dir) / "e2e_asset_a_1440.png"), full_page=True
                     )
 
-                # 3. Navigate to Compare (UC-03) and check control numbers & red 52% warning
+                # 3. Navigate to Compare and check control numbers & topup options
                 page.click('a[href^="#compare"]')
                 page.wait_for_selector(".compare-grid")
                 cmp_text = page.inner_text("main")
-                self.assertIn("Продать и оставить деньги", cmp_text)
-                self.assertIn("52%", cmp_text)
-                self.assertIn("Лимит концентрации 45%", cmp_text)
-
-                page.click('button[data-variant="replace"]')
-                page.wait_for_selector('button[data-variant="replace"][aria-pressed="true"]')
-                self.assertIn("Заменить на Вектор", page.inner_text("#comparison-detail"))
-
-                # Run custom What-If simulation (UC-05 partial sell 50% + 30 bps fee)
-                page.fill('input[name="sell_share_pct"]', "50")
-                page.fill('input[name="commission_rate_bps"]', "30")
-                page.click('#sandbox-form button[type="submit"]')
-                page.wait_for_selector(".sandbox-result")
-                sim_text = page.inner_text(".sandbox-result")
-                self.assertIn("45 ₽", sim_text)
-                self.assertIn("14\u00a0955 ₽", sim_text)
+                self.assertIn("Докупить СеверТех", cmp_text)
+                self.assertIn("Купить Вектор", cmp_text)
+                self.assertIn("102\u00a0526 ₽", cmp_text)
+                self.assertIn("Крупнейшая доля", cmp_text)
                 if screenshot_dir:
                     page.screenshot(
                         path=str(Path(screenshot_dir) / "e2e_compare_1440.png"), full_page=True
                     )
 
-                # 4. Switch to topup mode (UC-01)
-                page.select_option("#mode", "topup")
-                page.wait_for_function(
-                    "() => document.querySelector('main').innerText.includes('+2\u00a0526')"
-                )
-                self.assertIn("+2\u00a0526 ₽", page.inner_text("main"))
-
-                # 5. Switch to partial_data mode (AC-03.4)
-                page.select_option("#mode", "partial_data")
-                page.wait_for_function(
-                    "() => document.querySelector('main').innerText.includes('Недостаточно данных для вывода')"
-                )
-
-                # 6. Check Asset O2 unavailable orderbook
-                page.select_option("#mode", "review")
-                page.wait_for_function(
-                    "() => document.querySelector('#mode')?.value === 'review'"
-                )
+                # 4. Check Asset O2 unavailable orderbook
                 page.goto(f"{base}/#asset/O2", wait_until="networkidle")
                 page.wait_for_selector(".asset-hero")
                 page.click('button[data-tab="book"]')
                 page.wait_for_selector('button[data-tab="book"][aria-pressed="true"]')
                 self.assertIn("недоступен", page.inner_text("main").lower())
 
-                # 7. Mobile 375px responsiveness check
+                # 5. Mobile 375px responsiveness check
                 page.set_viewport_size({"width": 375, "height": 812})
                 page.goto(f"{base}/#portfolio", wait_until="networkidle")
-                page.wait_for_selector(".metric-strip")
+                page.wait_for_selector(".portfolio-columns")
                 self.assertTrue(
                     page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
                 )

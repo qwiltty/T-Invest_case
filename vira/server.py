@@ -74,6 +74,12 @@ def _make_handler(service: ViraService, web_dir: Path) -> type[BaseHTTPRequestHa
                 self._handle_api_get(path, query)
                 return
 
+            if path in ("/TRAILER_VIRA.mp4", "TRAILER_VIRA.mp4"):
+                trailer_candidate = web_dir.parent.parent / "TRAILER_VIRA.mp4"
+                if trailer_candidate.exists():
+                    self._send_file(trailer_candidate)
+                    return
+
             rel = "index.html" if path in ("", "/") else path.lstrip("/")
             candidate = (web_dir / rel).resolve()
             if not candidate.is_relative_to(web_dir.resolve()):

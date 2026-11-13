@@ -2,968 +2,691 @@
 
 const main = document.querySelector("#main");
 const dialog = document.querySelector("#source-dialog");
-const traceMeta = document.querySelector("#trace-meta");
-const headerBadge = document.querySelector("#header-badge");
-
-const SERIES_META = [
-  { key: "optimistic", name: "Оптимистичный", color: "#16744f", dash: [], css: "" },
-  { key: "base", name: "Базовый", color: "#4a8ec6", dash: [8, 4], css: "dash" },
-  { key: "pessimistic", name: "Пессимистичный", color: "#ad3449", dash: [2, 5], css: "dot" },
+const series = [
+  { name:"Оптимистичный", color:"#16744f", dash:[], css:"" },
+  { name:"Базовый", color:"#4a8ec6", dash:[8,4], css:"dash" },
+  { name:"Пессимистичный", color:"#ad3449", dash:[2,5], css:"dot" }
 ];
-
-const ICONS = {
-  chart: '<path d="M4 5.5h2v13H20v2H4z"/><path d="m8 15 3.5-3.8 3 2.2L19 8.5l1.5 1.4-5.7 6.2-3-2.2-2.3 2.5z"/>',
-  branches: '<path d="M4 11h5c2 0 3.2-1.3 4.6-3.3L15.4 5H20v2h-3.6l-1.3 1.9c-1.4 2-2.4 3.2-4 3.7 1.6.5 2.6 1.7 4 3.7l1.3 1.7H20v2h-4.6l-1.8-2.5C12.2 15.5 11 14 9 14H4z"/>',
-  book: '<path d="M5 5h14a2 2 0 0 1 2 2v2H3V7a2 2 0 0 1 2-2zm-2 6h18v3H3zm0 5h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
-  arrow: '<path d="m8 4 8 8-8 8-1.5-1.5L13 12 6.5 5.5z"/>',
-  down: '<path d="M5 5h2.7l9.8 9.8V9H20v11H9v-2.5h6.8L5 6.7z"/>',
-  source: '<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm7 2v4h4l-4-4zm-5 7v1.5h7V12zm0 3.5V17h7v-1.5z"/>',
+const assets = {
+  A:{ name:"СеверТех", ticker:"SVTX", kind:"Акция", initials:"СТ", style:"risk",
+    price:300, returns:[12,4,-18], history:[260,264,262,267,265,270,268,274,273,280,275,283,277,291,286,292,287,296,289,299,294,300],
+    stats:[["Выручка","↑ 8%"],["Чистый долг / EBITDA","3,1×"],["Свободный денежный поток","↓ 11%"]],
+    notes:["Рост выручки поддерживает базовый сценарий.", "Рост расходов на обслуживание долга может ухудшить денежный поток."],
+    events:[["Эмитент обновил условия финансирования","Прямая связь","Более высокая стоимость долга может увеличить процентные расходы.","СеверТех сообщает, что часть долга рефинансируется по плавающей ставке. В учебном сценарии рост ставки повышает расходы эмитента."],
+      ["Поставщик повысил тариф на комплектующие","Косвенная связь","Компоненты поставщика используются в основном продукте СеверТеха.","Учебная выдержка из примечаний к отчёту описывает договор с поставщиком. Рост тарифа влияет на себестоимость при неизменной цене продажи."]]},
+  B:{ name:"Вектор", ticker:"VCTR", kind:"Акция", initials:"В", style:"b",
+    price:220, returns:[7,3,-7], history:[188,190,189,193,191,195,193,198,196,200,198,207,203,206,211,210,213,209,215,216,219,220],
+    stats:[["Выручка","↑ 5%"],["Чистый долг / EBITDA","1,2×"],["Свободный денежный поток","↑ 4%"]],
+    notes:["Долговая нагрузка ниже, чем у СеверТеха.", "Покупка на всю выручку от А повышает концентрацию."],
+    events:[["Вектор опубликовал учебную отчётность","Прямая связь","Денежный поток вырос на 4% по учебным данным.","В этой версии учебного отчёта выручка выросла на 5%, а свободный денежный поток на 4%."]]},
+  O1:{ name:"Город Финанс", ticker:"Выпуск 01", kind:"Облигация", initials:"ГФ", style:"bond",
+    price:1000, returns:[1.2,.7,-.8], history:[978,980,979,982,981,984,983,986,986,988,986,992,991,995,992,990,994,998,996,998,999,1000],
+    stats:[["Номинал","1 000 ₽"],["Тип купона","Фиксированный"],["Валюта","RUB"]],
+    notes:["Фиксированный купон задан учебными условиями выпуска.", "При росте рыночных ставок цена может снизиться."],
+    events:[["Обновлены параметры учебного выпуска","Прямая связь","В модели используется фиксированный купон.","Демонстрационный выпуск номинирован в рублях. Параметры заданы для проверки карточки инструмента."]]},
+  O2:{ name:"Энергия", ticker:"Выпуск 02", kind:"Облигация", initials:"Э", style:"bond",
+    price:1000, returns:[1.2,.7,-.8], history:[974,977,976,980,979,982,981,983,983,985,990,989,992,994,992,997,996,998,999,997,999,1000],
+    stats:[["Номинал","1 000 ₽"],["Тип купона","Фиксированный"],["Валюта","RUB"]],
+    notes:["Учебные параметры выпуска доступны.", "Данные стакана в этом снимке отсутствуют."],
+    events:[["Доступны параметры учебного выпуска","Прямая связь","Стакан для этого снимка недоступен.","Карточка сохраняет параметры инструмента и условные сценарии. Снимок заявок отсутствует в учебном наборе."]]}
+};
+const modes = {
+  review:{ name:"Проверка портфеля", cash:0, amounts:{ A:30000,B:22000,O1:25000,O2:23000 } },
+  topup:{ name:"Пополнение портфеля", cash:10000, amounts:{ A:30000,B:22000,O1:21000,O2:17000 } }
 };
 
-const state = {
-  portfolios: [],
-  portfolioId: "review",
-  tab: "history",
-  newsFilter: "all",
-  selectedVariant: null,
-  lastRoute: "",
-  chart: null,
-  chartObserver: null,
-  opener: null,
-  currentSources: {},
-  customSim: null,
-  newsLoading: false,
-  newsError: "",
-  customForm: {
-    action: "partial_sell",
-    target_key: "A",
-    replacement_key: "B",
-    sell_share_pct: "50",
-    commission_rate_bps: "30",
-  },
+const horizons = {
+  1:{days:1,label:"1 день",term:"1 торговый день"},
+  7:{days:7,label:"7 дней",term:"7 торговых дней"},
+  21:{days:21,label:"Месяц",term:"21 торговый день"}
 };
+const month = horizons[21];
+let horizon = month;
+let mode = "topup";
+let tab = "history";
+let newsFilter = "all";
+let lastRoute = "";
+let chart = null;
+let opener = null;
+const money = (value, signed=false) => {
+  const prefix = value < 0 ? "−" : signed && value > 0 ? "+" : "";
+  return prefix + Math.abs(value).toLocaleString("ru-RU",{maximumFractionDigits:2}) + " ₽";
+};
+const percent = (value, signed=false) => {
+  const prefix = value < 0 ? "−" : signed && value > 0 ? "+" : "";
+  return prefix + Math.abs(value).toLocaleString("ru-RU",{maximumFractionDigits:2}) + "%";
+};
+const pill = (tone,label) => `<span class="pill ${tone}">${label}</span>`;
 
-function esc(str) {
-  return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
+const icons = {
+  chart:'<path d="M4 5.5h2v13H20v2H4z"/><path d="m8 15 3.5-3.8 3 2.2L19 8.5l1.5 1.4-5.7 6.2-3-2.2-2.3 2.5z"/>',
+  branches:'<path d="M4 11h5c2 0 3.2-1.3 4.6-3.3L15.4 5H20v2h-3.6l-1.3 1.9c-1.4 2-2.4 3.2-4 3.7 1.6.5 2.6 1.7 4 3.7l1.3 1.7H20v2h-4.6l-1.8-2.5C12.2 15.5 11 14 9 14H4z"/>',
+  book:'<path d="M5 5h14a2 2 0 0 1 2 2v2H3V7a2 2 0 0 1 2-2zm-2 6h18v3H3zm0 5h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  arrow:'<path d="m8 4 8 8-8 8-1.5-1.5L13 12 6.5 5.5z"/>',
+  down:'<path d="M5 5h2.7l9.8 9.8V9H20v11H9v-2.5h6.8L5 6.7z"/>',
+  source:'<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm7 2v4h4l-4-4zm-5 7v1.5h7V12zm0 3.5V17h7v-1.5z"/>'
+};
 function icon(name) {
-  return `<svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">${ICONS[name] || ""}</svg>`;
+  return '<svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">'+icons[name]+'</svg>';
 }
 
-function pill(tone, label) {
-  return `<span class="pill ${esc(tone)}">${esc(label)}</span>`;
+const link = (to,label,variant="") => `<a class="button ${variant}" href="#${to}">${label}${icon("arrow")}</a>`;
+const symbol = asset => `<span class="symbol ${asset.style}" aria-hidden="true">${asset.initials}</span>`;
+const sizes = value => Math.round((value + Number.EPSILON)*100)/100;
+
+function scenarioRate(item,index,period=horizon) {
+  return item.returns[index]*period.days/month.days;
 }
 
-function linkButton(to, label, variant = "") {
-  return `<a class="button ${esc(variant)}" href="#${esc(to)}">${esc(label)}${icon("arrow")}</a>`;
+function scenarioChange(amount,item,index,period=horizon) {
+  return sizes(amount*scenarioRate(item,index,period)/100);
 }
 
-function symbolBadge(item) {
-  return `<span class="symbol ${esc(item.style)}" aria-hidden="true">${esc(item.initials)}</span>`;
+function calculate(amounts, cash) {
+  const total = Object.values(amounts).reduce((sum,value)=>sum+value,cash);
+  const totalChange = (index,period)=>sizes(Object.entries(amounts).reduce(
+    (sum,[key,value])=>sum+scenarioChange(value,assets[key],index,period),0));
+  const changes = series.map((_,index)=>totalChange(index,horizon));
+  const share = Math.max(...Object.values(amounts))/total*100;
+  const loss = Math.max(0,-changes[2]);
+  const monthLoss = Math.max(0,-totalChange(2,month));
+  const concentrationLimit=share>=45;
+  const lossLimit=monthLoss/total>=.1;
+  return {total,changes,share,loss,monthLoss,concentrationLimit,lossLimit,limit:concentrationLimit||lossLimit};
 }
 
-function statusToneFromEnum(status) {
-  if (status === "HEALTHY") return "good";
-  if (status === "WARNING") return "warn";
-  if (status === "CRITICAL") return "bad";
-  return "neutral";
+function instrumentStatus(key) {
+  if(key==="A") return pill("warn","Внимание");
+  if(key==="O2") return pill("neutral","Часть данных недоступна");
+  return pill("good","Приемлемый риск");
 }
 
-function formatMoneyClient(value) {
-  const prefix = value < 0 ? "−" : "";
-  return prefix + Math.abs(value).toLocaleString("ru-RU", { maximumFractionDigits: 2 }) + " ₽";
+function metricExplanation(label) {
+  const guides={
+    "Выручка":"Показывает масштаб продаж. Сравнивайте темп роста с прошлыми периодами и ожиданиями рынка.",
+    "Чистый долг / EBITDA":"Ориентир долговой нагрузки относительно операционного результата. Сопоставляйте с динамикой компании и отраслью.",
+    "Свободный денежный поток":"Деньги после операционных расходов и инвестиций. Устойчивое снижение может ограничить развитие и выплаты.",
+    "Номинал":"Сумма, которую эмитент должен погасить в дату погашения при выполнении обязательств.",
+    "Тип купона":"Определяет, как рассчитываются процентные выплаты. Сверяйте условия и даты выплат с документами выпуска.",
+    "Валюта":"Валюта обязательств и выплат. Она может создавать валютный риск для инвестора."
+  };
+  return guides[label]||"Показатель из учебной карточки; интерпретируйте его вместе с остальными данными и условиями инструмента.";
 }
 
-async function apiGet(url) {
-  const resp = await fetch(url, { headers: { Accept: "application/json" } });
-  const data = await resp.json();
-  if (!resp.ok) {
-    throw new Error(data.error || `Ошибка API ${resp.status}`);
-  }
-  return data;
+function issuerTakeaway(item,key) {
+  if(key==="A") return "Выручка растёт, но свободный денежный поток снижается. Проверьте, сохраняется ли эта динамика, и оцените долговую нагрузку: одного роста продаж недостаточно для вывода о привлекательности акции.";
+  if(key==="B") return "В учебном наборе выручка и денежный поток растут. Сравните эту динамику с оценкой акции, отраслевыми рисками и долей бумаги в портфеле.";
+  if(key==="O1") return "Для решения важны не только номинал и тип купона, но и доходность к погашению, срок, цена покупки и кредитный риск. Эти параметры в учебном макете не показаны.";
+  return "Проверьте условия выплат, доходность к погашению, срок и кредитный риск эмитента. Если части рыночных данных нет, вывод по выпуску будет неполным.";
 }
 
-async function apiPost(url, body) {
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await resp.json();
-  if (!resp.ok) {
-    throw new Error(data.error || `Ошибка API ${resp.status}`);
-  }
-  return data;
-}
-
-function updateTraceFooter(trace) {
-  if (!trace || !traceMeta) return;
-  const modeLabel = trace.agent_mode === "llm_verified" ? "LLM + Guardrail" : "Бизнес-правила";
-  const guardLabel = trace.guardrail_passed ? "числа сверены" : "требует проверки";
-  const datePart = String(trace.snapshot_date || "").slice(0, 10);
-  traceMeta.textContent = `Движок v${trace.engine_version} · Режим: ${modeLabel} (${guardLabel}) · Снимок: ${datePart} · Округление: ${trace.rounding}`;
-  if (headerBadge) {
-    headerBadge.innerHTML = `<span aria-hidden="true"></span>Учебные данные · ${esc(modeLabel)}`;
-  }
-}
-
-function modeSelect() {
-  return `<label class="select-label" for="mode">Учебный портфель<select id="mode">
-    ${state.portfolios
-      .map(
-        (item) =>
-          `<option value="${esc(item.portfolio_id)}" ${
-            item.portfolio_id === state.portfolioId ? "selected" : ""
-          }>${esc(item.name)}</option>`
-      )
-      .join("")}
-  </select></label>`;
-}
-
-function metricBlock(label, value, note, tone = "") {
-  return `<div class="metric"><span class="metric-name">${esc(label)}</span><strong class="metric-number ${esc(
-    tone
-  )}">${esc(value)}</strong><span class="metric-small">${esc(note)}</span></div>`;
-}
-
-function chartFrame(title, subtitle, chartConfig) {
-  const isHistory = chartConfig.kind === "history";
-  const legend = isHistory
-    ? ""
-    : `<div class="legend" aria-label="Серии графика">${SERIES_META.map((item, index) => {
-        const displayVal = chartConfig.legendValues[index];
-        const displaySub = chartConfig.legendSubValues ? chartConfig.legendSubValues[index] : "";
-        return `
-        <button type="button" class="legend-btn" data-series="${index}" aria-pressed="true">
-          <span class="legend-name"><i class="${item.css}" aria-hidden="true" style="--series:${item.color}"></i>${esc(
-          item.name
-        )}</span>
-          <strong>${esc(displayVal)}</strong>
-          ${displaySub ? `<small>${esc(displaySub)}</small>` : ""}
-        </button>`;
-      }).join("")}</div>`;
-
-  state.chart = chartConfig;
-  const ariaSummary = isHistory
-    ? `Последняя цена ${formatMoneyClient(chartConfig.values.at(-1))}`
-    : SERIES_META.map((s, i) => `${s.name} ${chartConfig.legendValues[i]}`).join(", ");
-
-  return `<section class="card chart-card"><div class="card-title"><div><h2>${esc(title)}</h2><p class="sub">${esc(
-    subtitle
-  )}</p></div>
-    ${isHistory ? "" : '<span class="period">21 сессия</span>'}</div>
-    <div class="chart-holder"><canvas id="chart" role="img" aria-label="${esc(title)}. ${esc(
-    ariaSummary
-  )}"></canvas><span id="chart-tip" class="chart-tooltip" hidden></span></div>${legend}</section>`;
-}
-
-function riskMeter(label, valueNum, valueFmt, limitNum, limitFmt, breached) {
-  const ratio = limitNum > 0 ? valueNum / limitNum : 0;
-  const stateCls = breached ? "is-breached" : ratio >= 0.75 ? "is-near" : "";
-  const caption = breached
-    ? `Превышен учебный лимит ${limitFmt}`
-    : ratio >= 0.75
-    ? "Приближение к учебному лимиту"
-    : "В пределах учебного лимита";
-  return `<div class="risk-meter ${stateCls}">
-    <div><span>${esc(label)}</span><strong>${esc(valueFmt)} <small>из ${esc(limitFmt)}</small></strong></div>
-    <progress value="${Math.min(valueNum, limitNum)}" max="${limitNum}" aria-label="${esc(
-    label
-  )}" aria-valuetext="${esc(valueFmt)} при лимите ${esc(limitFmt)}"></progress>
-    <span class="meter-caption">${esc(caption)}</span>
+function horizonPicker(id) {
+  return `<div class="segmented horizon-picker" id="${id}" role="group" aria-label="Горизонт прогноза">
+    ${Object.values(horizons).map(period=>`<button type="button" data-horizon="${period.days}" aria-pressed="${period===horizon}">${period.label}</button>`).join("")}
   </div>`;
 }
 
-function renderMissingBanner(items, hasCriticalGap) {
-  if (!items || items.length === 0) return "";
-  return `<section class="card data-alert ${hasCriticalGap ? "is-warn" : ""}" role="status">
-    <div>
-      <h3>${hasCriticalGap ? "Часть данных устарела или отсутствует" : "Замечания по полноте данных"}</h3>
-      <ul>${items.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
+function chartFrame(title,subtitle,values,kind,price=0) {
+  const legend = kind==="history" ? "" : `<div class="legend" aria-label="Серии графика">${series.map((item,index)=>`
+    <button type="button" class="legend-btn" data-series="${index}" aria-pressed="true">
+      <span class="legend-name"><i class="${item.css}" aria-hidden="true" style="--series:${item.color}"></i>${item.name}</span>
+      <strong>${kind==="portfolio"?money(values[index],true):percent(values[index],true)}</strong>
+      ${kind==="portfolio"?`<small>${percent(values[index]/price*100,true)}</small>`:""}
+    </button>`).join("")}</div>`;
+  const options = {kind,values,price,days:horizon.days};
+  chart=options;
+  return `<section class="card chart-card"><div class="card-title"><div><h2>${title}</h2>${subtitle?`<p class="sub">${subtitle}</p>`:""}</div>
+    ${kind==="portfolio"?"":horizonPicker("horizon-chart")}</div>
+    <div class="chart-holder"><canvas id="chart" role="img" aria-label="${title}. ${kind==="history"?"Последняя цена "+money(values.at(-1)):horizon.term+". "+series.map((s,i)=>s.name+" "+(kind==="portfolio"?money(values[i],true):percent(values[i],true))).join(", ")}"></canvas><span id="chart-tip" class="chart-tooltip" hidden></span></div>${legend}</section>`;
+}
+
+function riskMeter(label,value,limit) {
+  return `<div class="risk-meter"><div><span>${label}</span><strong>${percent(value)} <small>из ${percent(limit)}</small></strong></div>
+    <progress value="${Math.min(value,limit)}" max="${limit}" aria-label="${label}" aria-valuetext="${percent(value)} при лимите ${percent(limit)}"></progress></div>`;
+}
+
+function positionScenarios(item,amount) {
+  return `<span class="position-scenarios">${series.map(({name},i)=>{
+    const rate=scenarioRate(item,i);
+    const change=scenarioChange(amount,item,i);
+    const endValue=sizes(amount+change);
+    return `<span class="position-scenario">
+      <span class="position-scenario-name">${name}</span>
+      <strong>${money(endValue)}</strong>
+      <small class="${change<0?"negative":change>0?"positive":""}"><span>${money(change,true)}</span> <span>(${percent(rate,true)})</span></small>
+    </span>`;
+  }).join("")}</span>`;
+}
+
+function portfolioDecision() {
+  const state=modes[mode];
+  const result=calculate(state.amounts,state.cash);
+  const positions=Object.entries(state.amounts).filter(([,amount])=>amount>0);
+  const stockValue=positions.filter(([key])=>assets[key].kind==="Акция").reduce((sum,[,amount])=>sum+amount,0);
+  const groups=[
+    {name:"Акции",value:stockValue,color:"#ffdd2d"},
+    {name:"Облигации",value:result.total-state.cash-stockValue,color:"#62a4d9"},
+    {name:"Деньги",value:state.cash,color:"#b7bfcd"}
+  ];
+  let offset=0;
+  const arcs=groups.map(group=>{
+    const share=group.value/result.total*100;
+    const arc=`<circle cx="70" cy="70" r="56" pathLength="100" fill="none" stroke="${group.color}" stroke-width="13" stroke-dasharray="${share} ${100-share}" stroke-dashoffset="${-offset}"/>`;
+    offset+=share;
+    return share>0?arc:"";
+  }).join("");
+  const contributions=positions.map(([key,amount])=>({key,value:scenarioChange(amount,assets[key],1)})).sort((a,b)=>b.value-a.value);
+  const maxContribution=Math.max(...contributions.map(item=>Math.abs(item.value)),1);
+  return `<section class="card portfolio-summary" aria-label="Обзор портфеля">
+    <div class="summary-balance">
+      <h2>Ваш портфель</h2>
+      <strong class="balance-value">${money(result.total)}</strong>
+      <dl class="balance-details">
+        <div><dt>Стоимость бумаг</dt><dd>${money(result.total-state.cash)}</dd></div>
+        <div><dt>Свободно для покупки</dt><dd>${money(state.cash)}</dd></div>
+      </dl>
+      ${link("compare","Сравнить варианты")}
     </div>
-    ${pill(hasCriticalGap ? "warn" : "neutral", hasCriticalGap ? "Ограниченный вывод" : "Частичный снимок")}
+    <div class="summary-allocation">
+      <h2>Состав портфеля</h2>
+      <div class="allocation-body">
+        <div class="allocation-ring">
+          <svg viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g transform="rotate(-90 70 70)">${arcs}</g></svg>
+          <div class="allocation-center"><strong>${positions.length}</strong><span>бумаги</span></div>
+        </div>
+        <dl class="allocation-legend">${groups.map(group=>`<div><dt><i style="background:${group.color}" aria-hidden="true"></i>${group.name}<strong>${percent(group.value/result.total*100)}</strong></dt><dd>${money(group.value)}</dd></div>`).join("")}</dl>
+      </div>
+    </div>
+    <div class="summary-forecast">
+      <h2>Что влияет на прогноз</h2>
+      <div class="contribution-list">${contributions.map(({key,value})=>`<a class="contribution-item" href="#asset/${key}" aria-label="${assets[key].name}: вклад в базовый сценарий ${money(value,true)}. Открыть бумагу."><span>${assets[key].name}</span><strong class="${value<0?"negative":"positive"}">${money(value,true)}</strong><span class="contribution-track" aria-hidden="true"><i style="width:${Math.abs(value)/maxContribution*100}%;background:${value<0?"var(--red)":"#62a4d9"}"></i></span></a>`).join("")}</div>
+      <div class="forecast-total"><span>Изменение портфеля</span><strong class="${result.changes[1]<0?"negative":"positive"}">${money(result.changes[1],true)} <small>(${percent(result.changes[1]/result.total*100,true)})</small></strong></div>
+    </div>
   </section>`;
 }
 
-function renderOverview(data) {
-  const calc = data.calculation;
-  const focus = data.focus_card;
-  const leadContrib = calc.contributions.find((c) => c.key === focus.key) || calc.contributions[0];
-  const pessScenario = calc.scenarios.pessimistic;
-  const optScenario = calc.scenarios.optimistic;
-  const baseScenario = calc.scenarios.base;
+function portfolioAlerts(state) {
+  const alerts=[];
+  if(state.amounts.A>0) alerts.push(`<article class="portfolio-alert"><div class="alert-title"><span class="alert-symbol" aria-hidden="true">!</span><h3>СеверТех: стоимость долга</h3></div><p>Новые условия финансирования могут увеличить расходы. Денежный поток в учебном отчёте снизился на 11%.</p><details><summary>Что проверить</summary><ul><li>Ставку и срок рефинансирования долга.</li><li>Причину снижения денежного потока и способность покрывать процентные расходы.</li></ul><a class="text-button" href="#asset/A">Отчёт и новости СеверТеха ${icon("arrow")}</a></details></article>`);
+  if(state.amounts.O2>0) alerts.push(`<article class="portfolio-alert"><div class="alert-title"><span class="alert-symbol neutral" aria-hidden="true">?</span><h3>Энергия: нет стакана</h3></div><p>Снимок заявок недоступен — объём покупки и продажи неизвестен.</p><details><summary>Что проверить</summary><ul><li>Свежесть котировок и наличие заявок.</li><li>Разницу между ценами покупки и продажи и объём по нужной цене.</li></ul><a class="text-button" href="#asset/O2">Открыть выпуск ${icon("arrow")}</a></details></article>`);
+  return `<section class="card alert-widget" aria-labelledby="alerts-title"><div class="alert-widget-head"><h2 id="alerts-title">Требует внимания</h2><span class="alert-count">${alerts.length}</span></div>${alerts.join("")||'<p>В учебном наборе нет предупреждений.</p>'}</section>`;
+}
 
-  const chartConfig = {
-    kind: "portfolio",
-    price: calc.initial_total_rub,
-    values: [optScenario.result_rub, baseScenario.result_rub, pessScenario.result_rub],
-    legendValues: [optScenario.result_fmt, baseScenario.result_fmt, pessScenario.result_fmt],
-    legendSubValues: [optScenario.result_pct_fmt, baseScenario.result_pct_fmt, pessScenario.result_pct_fmt],
-  };
+function limitChart(value,limit,max,color,label) {
+  return `<div class="limit-chart" role="img" aria-label="${label}: ${percent(value)}, лимит ${percent(limit)}"><div class="limit-track" style="--threshold:${limit/max*100}%"><span style="width:${Math.min(100,Math.max(0,value/max*100))}%;background:${color}"></span><i></i></div><div class="limit-axis"><span>0%</span><strong style="left:${limit/max*100}%">Лимит ${percent(limit)}</strong><span>${percent(max)}</span></div></div>`;
+}
 
-  const breakdownHtml = `<details class="breakdown-box">
-    <summary>Как получен пессимистичный результат (${esc(data.pessimistic_breakdown.total_fmt)})</summary>
-    <div class="breakdown-list">${data.pessimistic_breakdown.terms
-      .map((t) => `<span>${esc(t)}</span>`)
-      .join(" + ")} = <strong>${esc(data.pessimistic_breakdown.total_fmt)}</strong></div>
-  </details>`;
+function portfolioRisk(state,result,positions) {
+  const lossLimit=result.total*.1;
+  const headroom=sizes(lossLimit-result.monthLoss);
+  const [largestKey,largestAmount]=positions[0];
+  const share=largestAmount/result.total*100;
+  const colors=["#c28b18","#62a4d9","#8292ae","#bcc7d7"];
+  const losses=positions.map(([key,amount])=>({key,loss:Math.max(0,-scenarioChange(amount,assets[key],2,month))})).sort((a,b)=>b.loss-a.loss);
+  const totalLoss=losses.reduce((total,item)=>total+item.loss,0);
+  return `<section class="card portfolio-risk-panel" aria-labelledby="risk-title"><div class="risk-panel-head"><h2 id="risk-title">Контроль риска</h2><span>${result.limit?"Лимит достигнут":"В пределах учебных лимитов"} · за месяц</span></div><div class="risk-panel-grid">
+    <div class="risk-panel-metric"><h3>Возможный убыток</h3><div class="risk-panel-value">${money(result.monthLoss)} <small>${percent(result.monthLoss/result.total*100)}</small></div><p>В пессимистичном сценарии</p>${limitChart(result.monthLoss/result.total*100,10,Math.max(15,result.monthLoss/result.total*100),result.lossLimit?"var(--red)":"#c28b18","Убыток за месяц")}<div class="risk-room">${headroom>0?`До лимита <strong>${money(headroom)}</strong>`:`Лимит ${headroom===0?"достигнут":"превышен на <strong>"+money(-headroom)+"</strong>"}`}</div></div>
+    <div class="risk-panel-metric"><h3>Доля крупнейшей бумаги</h3><div class="risk-panel-value">${percent(share)} <small>${assets[largestKey].name}</small></div><p>${money(largestAmount)} из ${money(result.total)}</p>${limitChart(share,45,Math.max(60,share),result.concentrationLimit?"var(--red)":"#62a4d9","Крупнейшая доля")}<div class="risk-room">${share<45?`До лимита <strong>${sizes(45-share).toLocaleString("ru-RU")} п. п.</strong>`:"Лимит концентрации достигнут"}</div></div>
+    <div class="risk-panel-metric loss-sources"><h3>Из чего складывается убыток</h3><p>Вклад бумаг в тот же сценарий</p><div class="loss-stack" aria-hidden="true">${losses.map((item,i)=>`<span style="width:${totalLoss?item.loss/totalLoss*100:0}%;background:${colors[i%colors.length]}"></span>`).join("")}</div><ul>${losses.map((item,i)=>`<li><a href="#asset/${item.key}"><i style="background:${colors[i%colors.length]}" aria-hidden="true"></i><span>${assets[item.key].name}</span><strong>${money(item.loss)}</strong></a></li>`).join("")}</ul></div>
+  </div><details class="risk-help"><summary>Как читать эти оценки</summary><p>Убыток рассчитан для пессимистичного сценария на 21 торговый день. Лимит убытка — 10% стоимости портфеля, лимит одной бумаги — 45%. Касание лимита считается его достижением. Запас показывает расстояние до ограничения модели и не гарантирует защиту: фактический убыток может быть больше. Полосы вклада показывают распределение сценарного убытка между бумагами; вероятность падения не рассчитана. При выборе короткого периода месячные лимиты сохраняются.</p></details></section>`;
+}
 
-  return `<div class="page-head"><div><h1>Прогноз портфеля</h1><p class="sub">${esc(
-    data.portfolio.description
-  )}</p></div>${modeSelect()}</div>
-    ${calc.has_missing_pricing_data ? renderMissingBanner(calc.missing_data_items, true) : ""}
-    <section class="card metric-strip" aria-label="Показатели портфеля">
-      ${metricBlock("Стоимость портфеля", calc.initial_total_fmt, "Свободно " + calc.cash_fmt)}
-      ${metricBlock("Пессимистичный сценарий", pessScenario.result_fmt, pessScenario.result_pct_fmt + " за месяц", "negative")}
-      ${metricBlock("Крупнейшая позиция", calc.largest_security_share_fmt, calc.largest_security_name)}
-    </section>
+function overview() {
+  const state=modes[mode];
+  const result=calculate(state.amounts,state.cash);
+  const positions=Object.entries(state.amounts).sort((a,b)=>b[1]-a[1]);
+  return `<div class="page-head portfolio-page-head"><div><h1>Прогноз портфеля</h1></div><div class="portfolio-head-actions">${horizonPicker("horizon-overview")}</div></div>
+    ${portfolioDecision()}
     <div class="columns portfolio-columns">
-      ${chartFrame("Стоимость портфеля", "Учебные траектории по трём сценариям", chartConfig)}
-      <aside class="stack" aria-label="Разбор риска">
-        <section class="card feature focus-card"><div class="feature-top"><h2>${esc(
-          focus.headline
-        )}</h2><img class="risk-illustration" src="risk-illustration.png" alt="" width="90" height="78"></div>
-          <div class="risk-impact"><strong>${esc(focus.impact_fmt)}</strong><span>${esc(
-    focus.impact_share_pct
-  )}% возможного убытка</span></div>
-          <div class="risk-share" aria-hidden="true"><span style="--fill:${Math.min(
-            100,
-            Math.max(0, focus.impact_share_pct)
-          )}%"></span></div>
-          <p>${esc(focus.summary)}</p>
-          ${linkButton("asset/" + focus.key, "Разобрать позицию")}
-        </section>
-        <section class="card limits"><h2>Риск и лимиты</h2>
-          ${riskMeter(
-            "Пессимистичный убыток",
-            calc.pessimistic_loss_pct,
-            calc.pessimistic_loss_pct_fmt,
-            calc.loss_limit_pct,
-            "10%",
-            calc.loss_limit_breached
-          )}
-          ${riskMeter(
-            "Крупнейшая позиция",
-            calc.largest_security_share_pct,
-            calc.largest_security_share_fmt,
-            calc.concentration_limit_pct,
-            "45%",
-            calc.concentration_limit_breached
-          )}
-        </section>
-      </aside>
+      ${chartFrame("Стоимость портфеля","",result.changes,"portfolio",result.total)}
+      <aside class="stack" aria-label="Предупреждения по портфелю">${portfolioAlerts(state)}</aside>
+      ${portfolioRisk(state,result,positions)}
     </div>
-    ${breakdownHtml}
-    <div class="section-head"><h2>Позиции портфеля</h2><p class="sub">По вкладу в пессимистичный результат</p></div>
+    <div class="section-head positions-head"><h2>Позиции портфеля</h2></div>
     <div class="card table-card">
-      <div class="asset-head" aria-hidden="true"><span class="asset-name">Бумага</span><span class="hide-mobile">Стоимость</span><span class="hide-mobile">Доля</span><span>Вклад в убыток</span><span>Оценка</span><span></span></div>
-      ${calc.contributions
-        .map(
-          (item) => `<a class="asset-row" href="#asset/${esc(item.key)}">
-          <span class="asset-name">${symbolBadge(item)}<span><strong>${esc(item.name)}</strong><small>${esc(
-            item.kind
-          )} · ${esc(item.ticker)}</small></span></span>
-          <span class="hide-mobile">${esc(item.amount_fmt)}</span>
-          <span class="hide-mobile">${esc(item.share_fmt)}</span>
-          <span class="negative" aria-label="Вклад в пессимистичный результат ${esc(item.pessimistic_fmt)}">${esc(
-            item.pessimistic_fmt
-          )}</span>
-          <span class="risk-cell">${pill(statusToneFromEnum(item.status), item.status_label)}</span>${icon("arrow")}
-        </a>`
-        )
-        .join("")}
+      <div class="asset-head" aria-hidden="true"><span class="asset-name">Бумага</span><span>Сейчас в портфеле</span><span class="position-scenarios">${series.map(({name})=>`<span>${name}</span>`).join("")}</span><span>Оценка</span><span></span></div>
+      ${positions.map(([key,value])=>{
+        const item=assets[key];
+        return `<a class="asset-row" href="#asset/${key}">
+          <span class="asset-name">${symbol(item)}<span><strong>${item.name}</strong><small>${item.kind} · ${item.ticker}</small></span></span>
+          <span class="position-size"><span class="position-size-label">Сейчас в портфеле: </span>${money(value)} <small>${percent(value/result.total*100)}</small></span>
+          ${positionScenarios(item,value)}
+          <span class="risk-cell">${instrumentStatus(key)}</span>${icon("arrow")}
+        </a>`;
+      }).join("")}
     </div>`;
 }
 
-function orderBookPanel(asset) {
-  if (!asset.orderbook.available) {
-    return `<section class="card"><h2>Стакан заявок</h2><p class="sub">${esc(asset.orderbook.note)}</p></section>`;
-  }
-  return `<section class="card"><h2>Стакан заявок</h2><p class="sub">${esc(asset.orderbook.note)}</p>
+function orderBook(item,key) {
+  if(key==="O2") return `<section class="card"><h2>Стакан заявок</h2><p class="sub">Учебный снимок стакана недоступен. Сценарии и данные выпуска остаются доступны.</p></section>`;
+  return `<section class="card"><h2>Стакан заявок</h2><p class="sub">Учебный снимок</p>
     <table class="book"><thead><tr><th scope="col">Сторона</th><th scope="col">Цена</th><th scope="col">Количество</th></tr></thead>
-    <tbody>${asset.orderbook.levels
-      .map(
-        (lvl) =>
-          `<tr><td class="${lvl.side === "Продажа" ? "negative" : "positive"}">${esc(lvl.side)}</td><td>${esc(
-            lvl.price_fmt
-          )}</td><td>${esc(lvl.quantity)}</td></tr>`
-      )
-      .join("")}</tbody></table></section>`;
+    <tbody>${[["Продажа",1.5,160],["Продажа",.5,220],["Покупка",-.5,180],["Покупка",-1.5,135]].map(([label,delta,count])=>
+      `<tr><td class="${delta>0?"negative":"positive"}">${label}</td><td>${money(item.price+delta)}</td><td>${count}</td></tr>`).join("")}</tbody></table></section>`;
 }
 
-function scenarioAssumptions(asset) {
-  return `<details class="assumptions"><summary>Предпосылки сценариев</summary><dl>${SERIES_META.map(
-    (item) =>
-      `<div><dt>${esc(item.name)}</dt><dd>${esc(asset.scenario_assumptions[item.key] || "")}</dd></div>`
-  ).join("")}</dl></details>`;
+function scenarioAssumptions(key) {
+  const content=key==="A"?["Выручка растёт, расходы на финансирование стабильны.","Текущая динамика выручки и долга сохраняется.","Дорогое рефинансирование ухудшает денежный поток."]:
+    ["Условия рынка улучшаются.","Текущие условия сохраняются.","Рыночные условия ухудшаются."];
+  return `<details class="assumptions"><summary>Предпосылки сценариев</summary><dl>${series.map((item,i)=>`<div><dt>${item.name}</dt><dd>${content[i]}</dd></div>`).join("")}</dl></details>`;
 }
 
-function newsPanel(asset, liveMeta) {
-  const filters = [
-    ["all", "Все"],
-    ["direct", "Прямые"],
-    ["indirect", "Косвенные"],
-  ];
-  const hasBothTypes = new Set(asset.events.map((e) => e.relation_type)).size > 1;
-  const articles = asset.events.filter(
-    (e) => state.newsFilter === "all" || e.relation_type === state.newsFilter
-  );
-  const liveSummary =
-    liveMeta && liveMeta.updated_at
-      ? `<p class="sub news-live-meta">Лента СМИ (ЦБ РФ, Интерфакс, РБК): ${esc(
-          liveMeta.deduped_count
-        )} новостей, привязано ${esc(liveMeta.linked_count)}</p>`
-      : "";
-
-  return `<section class="card">
-    <div class="news-card-head">
-      <h2>Новости</h2>
-      <button class="text-button" type="button" data-action="refresh-news" ${
-        state.newsLoading ? "disabled" : ""
-      }>${state.newsLoading ? "Загрузка..." : "Обновить ленту СМИ"}</button>
-    </div>
-    ${liveSummary}
-    ${state.newsError ? `<p class="sub negative">${esc(state.newsError)}</p>` : ""}
-    ${
-      hasBothTypes
-        ? `<div class="segmented news-filters" aria-label="Связь новости с бумагой">
-      ${filters
-        .map(
-          ([id, label]) =>
-            `<button type="button" data-news-filter="${esc(id)}" aria-pressed="${
-              id === state.newsFilter
-            }">${esc(label)}</button>`
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-    ${articles
-      .map(
-        (ev) => `<article class="news"><small>${esc(ev.date)} · ${esc(ev.relation_label)}${
-          ev.is_live ? " · Живая лента" : ""
-        }</small>
-      <h3>${esc(ev.title)}</h3>
-      <div class="fact-grid">
-        <div><strong>Факт</strong><span>${esc(ev.fact)}</span></div>
-        ${
-          ev.relation_type === "indirect"
-            ? `<div><strong>Связь с бумагой</strong><span>${esc(ev.relation_basis)}</span></div>`
-            : ""
-        }
-        <div><strong>Интерпретация</strong><span>${esc(ev.interpretation)}</span></div>
-      </div>
-      <button class="text-button" type="button" data-source="${esc(ev.source_id)}">${
-          ev.is_live ? "Открыть источник" : "Учебный источник"
-        }</button></article>`
-      )
-      .join("")}
+function newsPanel(item) {
+  const filters=[["all","Все"],["direct","Прямые"],["indirect","Косвенные"]];
+  const hasBothTypes=new Set(item.events.map(event=>event[1])).size>1;
+  const articles=item.events.map((event,index)=>({event,index})).filter(({event})=>
+    newsFilter==="all"||(newsFilter==="direct"?event[1]==="Прямая связь":event[1]==="Косвенная связь"));
+  return `<section class="card"><h2>Новости</h2>
+    ${hasBothTypes?`<div class="segmented news-filters" aria-label="Связь новости с бумагой">
+      ${filters.map(([id,label])=>`<button type="button" data-news-filter="${id}" aria-pressed="${id===newsFilter}">${label}</button>`).join("")}
+    </div>`:""}
+    ${articles.map(({event:[title,type,impact],index})=>`<article class="news"><small>${index===0?"10 ноября":"7 ноября"} · ${type}</small>
+      <h3>${title}</h3><p>${impact}</p><button class="text-button" type="button" data-source="${index}">Учебный источник</button></article>`).join("")}
   </section>`;
 }
 
-function renderAssetPage(data) {
-  const asset = data.asset;
-  const verdict = data.verdict;
-  state.currentSources = data.sources || {};
-
-  let headingHtml;
-  if (state.tab === "book") {
-    state.chart = null;
-    headingHtml = orderBookPanel(asset);
-  } else if (state.tab === "scenarios") {
-    headingHtml = chartFrame("Сценарии бумаги", "Учебные предпосылки на месяц", {
-      kind: "asset",
-      price: asset.price_rub,
-      values: [
-        asset.scenario_returns_pct.optimistic,
-        asset.scenario_returns_pct.base,
-        asset.scenario_returns_pct.pessimistic,
-      ],
-      legendValues: [
-        asset.scenario_returns_fmt.optimistic,
-        asset.scenario_returns_fmt.base,
-        asset.scenario_returns_fmt.pessimistic,
-      ],
-    });
-  } else {
-    headingHtml = chartFrame("История цены", "Учебные данные за последние сессии", {
-      kind: "history",
-      values: asset.history_prices,
-    });
-  }
-
-  const reportSourceId = asset.issuer_metrics[0]?.source_id || "";
-  const compareTarget =
-    data.mode === "topup" ? "compare" : `compare/${asset.key}`;
-
+function assetPage(key) {
+  const item=assets[key];
+  const heading=tab==="book"?orderBook(item,key):tab==="scenarios"?
+    chartFrame("Сценарии бумаги",`Учебный расчёт на ${horizon.term}`,series.map((_,i)=>scenarioRate(item,i)),"asset",item.price):
+    chartFrame("История цены",`Учебные данные · ${horizon.term}`,item.history.slice(-(horizon.days+1)),"history");
   return `<a class="back" href="#portfolio"><span aria-hidden="true">‹</span> К портфелю</a>
-    <div class="page-head">
-      <div class="asset-hero">${symbolBadge(asset)}<div><h1>${esc(asset.name)}</h1><p class="sub">${esc(
-    asset.kind
-  )} · ${esc(asset.ticker)}</p></div></div>
-      <div><span class="metric-name">Учебная цена${
-        asset.data_status.quotes !== "fresh" ? " (устарела)" : ""
-      }</span><div class="quote">${esc(asset.price_fmt)}</div></div>
+    <div class="page-head asset-heading"><div class="asset-hero">${symbol(item)}<div><h1>${item.name}</h1><p class="sub">${item.kind} · ${item.ticker}</p></div></div>
+      <div class="asset-quote"><span class="metric-name">Учебная цена</span><div class="quote">${money(item.price)}</div></div>
     </div>
-    ${renderMissingBanner(asset.data_status.missing_reasons, !asset.data_status.has_sufficient_pricing)}
     <div class="columns asset-columns">
       <section class="card asset-data" aria-label="Данные бумаги">
-        <div class="segmented" aria-label="Вид данных">
-          ${[
-            ["history", "Цена", "chart"],
-            ["scenarios", "Три сценария", "branches"],
-            ["book", "Стакан", "book"],
-          ]
-            .map(
-              ([id, label, glyph]) =>
-                `<button type="button" data-tab="${esc(id)}" aria-pressed="${
-                  id === state.tab
-                }">${icon(glyph)}${esc(label)}</button>`
-            )
-            .join("")}
-        </div>
-        ${headingHtml}
-        ${state.tab === "scenarios" ? scenarioAssumptions(asset) : ""}
+        <div class="segmented asset-filters" aria-label="Вид данных">
+          ${[["history","Цена","chart"],["scenarios","Три сценария","branches"],["book","Стакан","book"]].map(([id,label,glyph])=>
+            `<button type="button" data-tab="${id}" aria-pressed="${id===tab}">${icon(glyph)}${label}</button>`).join("")}
+        </div>${heading}
+        ${tab==="scenarios"?scenarioAssumptions(key):""}
       </section>
       <aside class="stack" aria-label="Вывод и новости">
-        <section class="card feature">
-          <div class="feature-top"><span class="symbol risk" aria-hidden="true">${icon("down")}</span><h2>Вывод VIRA</h2></div>
-          ${pill(statusToneFromEnum(verdict.status), verdict.status_label)}
-          <h3 class="verdict">${esc(verdict.title)}</h3>
+        <section class="card feature"><div class="feature-top"><span class="symbol risk" aria-hidden="true">${icon("down")}</span><h2>Вывод VIRA</h2></div>
+          ${instrumentStatus(key)}
+          ${key==="A"?`<h3 class="verdict">${mode==="review"?"Рассмотреть продажу":"Рассмотреть докупку"}</h3>`:""}
           <ul class="arguments" aria-label="Аргументы">
-            ${asset.arguments
-              .map(
-                (arg) =>
-                  `<li data-polarity="${esc(arg.polarity)}"><span aria-hidden="true">${
-                    arg.polarity === "pro" ? "+" : "!"
-                  }</span><p>${esc(arg.text)}</p></li>`
-              )
-              .join("")}
+            <li><span aria-hidden="true">+</span><p>${item.notes[0]}</p></li>
+            <li><span aria-hidden="true">!</span><p>${item.notes[1]}</p></li>
           </ul>
-          <p>${esc(verdict.rationale)}</p>
-          <p class="review-trigger"><strong>Когда пересмотреть:</strong> ${esc(verdict.review_trigger)}</p>
-          ${linkButton(compareTarget, "Сравнить варианты")}
+          <p>${key==="A" ? (mode==="review"?"Сравните удержание, продажу и замену.":"Сравните докупку с альтернативой.") : "Откройте сравнение вариантов для портфеля."}</p>
+          ${link("compare","Сравнить варианты")}
         </section>
-        ${newsPanel(asset, data.live_news_meta)}
+        ${newsPanel(item)}
       </aside>
-      <section class="card issuer-metrics">
-        <h2>Показатели эмитента</h2>
-        <div class="stats">${asset.issuer_metrics
-          .map((m) => `<div><small>${esc(m.label)} (${esc(m.period)})</small><strong>${esc(m.value)}</strong></div>`)
-          .join("")}</div>
-        ${
-          reportSourceId
-            ? `<button type="button" class="text-button" data-source="${esc(reportSourceId)}">${icon(
-                "source"
-              )}Открыть учебный отчёт</button>`
-            : ""
-        }
+      <section class="card issuer-metrics"><div class="issuer-heading"><div><h2>${item.kind==="Акция"?"Финансовые показатели компании":"Параметры выпуска"}</h2><p class="sub">Что показывают данные и на что инвестору обратить внимание</p></div><button type="button" class="text-button" data-source="report">${icon("source")}Открыть учебный отчёт</button></div>
+        <div class="stats">${item.stats.map(([label,value])=>`<article class="stat-card"><small>${label}</small><strong>${value}</strong><p>${metricExplanation(label)}</p></article>`).join("")}</div>
+        <div class="issuer-reading"><strong>Как читать вместе</strong><p>${issuerTakeaway(item,key)}</p></div>
       </section>
     </div>`;
 }
 
-function comparisonDetail(selected, baseline) {
-  const d = selected.deltas;
-  const changes = [
-    ["Базовый результат", d.base_fmt, d.base_tone],
-    ["Пессимистичный убыток", d.loss_fmt, d.loss_tone],
-    ["Крупнейшая доля", d.share_fmt, d.share_tone],
+function choices() {
+  const state=modes[mode];
+  const base={...state.amounts};
+  const options=mode==="review" ? [
+    {id:"hold",title:"Держать СеверТех",amounts:base,cash:0},
+    {id:"sell",title:"Продать и оставить деньги",amounts:{...base,A:0},cash:base.A},
+    {id:"replace",title:"Заменить на Вектор",amounts:{...base,A:0,B:base.B+base.A},cash:0}
+  ] : [
+    {id:"hold",title:"Оставить деньги",amounts:base,cash:state.cash},
+    {id:"add",title:"Докупить СеверТех",amounts:{...base,A:base.A+state.cash},cash:0},
+    {id:"alternative",title:"Купить Вектор",amounts:{...base,B:base.B+state.cash},cash:0}
   ];
-  return `<section class="card comparison-detail" id="comparison-detail" aria-labelledby="difference-title">
-    <div class="card-title"><div><h2 id="difference-title" tabindex="-1">Что меняется</h2>
-      <p class="sub">${esc(selected.title)} · относительно варианта «${esc(baseline.title)}»</p></div></div>
-    <dl>${changes
-      .map(
-        ([label, value, tone]) =>
-          `<div><dt>${esc(label)}</dt><dd class="${esc(tone)}">${esc(value)}</dd></div>`
-      )
-      .join("")}</dl>
-    ${!selected.is_baseline ? `<p class="delta-explanation">${esc(selected.explanation)}</p>` : ""}
-  </section>`;
+  const calculated=options.map(option=>({...option,...calculate(option.amounts,option.cash)}));
+  const baseline=calculated[0];
+  const eligible=calculated.filter(option=>!option.limit && (option===baseline || (mode==="review"?
+    option.loss<baseline.loss || option.share<baseline.share : option.changes[1]>baseline.changes[1])));
+  eligible.sort((a,b)=>mode==="review"?a.loss-b.loss||a.share-b.share:b.changes[1]-a.changes[1]);
+  return {baseline,preferred:eligible[0],sorted:[...eligible,...calculated.filter(option=>!eligible.includes(option))]};
 }
 
-function renderCustomSandbox(data) {
-  const instruments = data.available_instruments || [];
-  const f = state.customForm;
-  const sim = state.customSim ? state.customSim.option : null;
-  return `<section class="card sandbox-card" aria-labelledby="sandbox-title">
-    <h2 id="sandbox-title">Своя What-If симуляция (UC-05 и комиссии Q-02)</h2>
-    <p class="sub">Проверьте частичную продажу, замену за счёт чистой выручки (BR-07) или влияние комиссии брокера через расчётный модуль.</p>
-    <form class="sandbox-form" id="sandbox-form">
-      <label>Действие
-        <select name="action">
-          <option value="partial_sell" ${f.action === "partial_sell" ? "selected" : ""}>Продать часть в деньги</option>
-          <option value="replace" ${f.action === "replace" ? "selected" : ""}>Продать и заменить</option>
-          <option value="buy" ${f.action === "buy" ? "selected" : ""}>Купить на свободные деньги</option>
-        </select>
-      </label>
-      <label>Позиция
-        <select name="target_key">
-          ${instruments
-            .map(
-              (i) =>
-                `<option value="${esc(i.key)}" ${f.target_key === i.key ? "selected" : ""}>${esc(
-                  i.name
-                )} (${esc(i.ticker)})</option>`
-            )
-            .join("")}
-        </select>
-      </label>
-      <label>Заменить на
-        <select name="replacement_key">
-          ${instruments
-            .map(
-              (i) =>
-                `<option value="${esc(i.key)}" ${f.replacement_key === i.key ? "selected" : ""}>${esc(
-                  i.name
-                )}</option>`
-            )
-            .join("")}
-        </select>
-      </label>
-      <label>Доля сделки, %
-        <input type="number" name="sell_share_pct" min="10" max="100" step="5" value="${esc(
-          f.sell_share_pct
-        )}">
-      </label>
-      <label>Комиссия, bps (0,01%)
-        <input type="number" name="commission_rate_bps" min="0" max="100" step="5" value="${esc(
-          f.commission_rate_bps
-        )}">
-      </label>
-      <button type="submit" class="button">Рассчитать сценарий</button>
-    </form>
-    ${
-      sim
-        ? `<div class="sandbox-result" role="region" aria-label="Результат пользовательской симуляции">
-        <div class="sandbox-result-head">
-          <strong>${esc(sim.title)}</strong>
-          ${pill(sim.limit_tone, sim.limit_badge)}
-        </div>
-        <dl class="sandbox-metrics">
-          <div><dt>Базовый результат</dt><dd>${esc(sim.calculation.scenarios.base.result_fmt)} (${esc(
-            sim.calculation.scenarios.base.result_pct_fmt
-          )})</dd></div>
-          <div><dt>Пессимистичный</dt><dd class="negative">${esc(
-            sim.calculation.scenarios.pessimistic.result_fmt
-          )} (${esc(sim.calculation.scenarios.pessimistic.result_pct_fmt)})</dd></div>
-          <div><dt>Крупнейшая доля</dt><dd class="${
-            sim.calculation.concentration_limit_breached ? "negative" : ""
-          }">${esc(sim.calculation.largest_security_share_fmt)}</dd></div>
-          <div><dt>Комиссия / свободные</dt><dd>${esc(sim.calculation.commissions_fmt)} / ${esc(
-            sim.calculation.cash_fmt
-          )}</dd></div>
-        </dl>
-        <p class="delta-explanation">${esc(sim.explanation)}</p>
-      </div>`
-        : ""
-    }
-  </section>`;
+function scenarioContributions(amounts,index) {
+  return Object.entries(amounts).filter(([,amount])=>amount>0).map(([key,amount])=>{
+    const item=assets[key];
+    return [item.name,amount,scenarioRate(item,index),scenarioChange(amount,item,index)];
+  });
 }
 
-function renderComparePage(data) {
-  const options = data.options || [];
-  const baseline = options.find((o) => o.option_id === data.baseline_option_id) || options[0];
-  const preferred = options.find((o) => o.option_id === data.preferred_option_id) || null;
-  const selected =
-    options.find((o) => o.option_id === state.selectedVariant) || preferred || baseline;
+function pessimisticBreakdown(selected) {
+  const rows=scenarioContributions(selected.amounts,2);
+  const [largest,largestAmount]=rows.reduce((a,b)=>a[1]>=b[1]?a:b);
+  if(selected.cash>0) rows.push(["Свободные деньги",selected.cash,0,0]);
+  return `<details class="calculation-breakdown">
+    <summary>Расчёт убытка и доли</summary>
+    <p>Умножаем сумму в каждой позиции после действия на её изменение в пессимистичном сценарии и складываем вклады.${horizon===month?"":" В таблице проценты округлены."}</p>
+    <ul>${rows.map(([name,amount,rate,impact])=>`<li><span>${name}</span><span>${money(amount)} × ${percent(rate,true)} = <strong>${money(impact,true)}</strong></span></li>`).join("")}</ul>
+    <p><strong>Итого ${money(selected.changes[2],true)}</strong> (${percent(selected.changes[2]/selected.total*100,true)} от ${money(selected.total)}). Стоимость портфеля в конце сценария — ${money(selected.total+selected.changes[2])}.</p>
+    <p><strong>Крупнейшая доля — ${largest}:</strong> ${money(largestAmount)} ÷ ${money(selected.total)} = ${percent(selected.share)}.</p>
+  </details>`;
+}
 
-  const subtext =
-    data.mode === "review"
-      ? `Что изменится для портфеля, если пересмотреть позицию «${data.target_name}».`
-      : `Что изменится, если вложить свободные ${data.cash_fmt}.`;
+function saleExample(item) {
+  const contributions=scenarioContributions(item.amounts,0);
+  return `<div class="option-example">
+    <p><strong>Откуда ${money(item.changes[0],true)}?</strong> В оптимистичном сценарии дорожают бумаги, которые остались: ${contributions.map(([name,,,impact])=>`${name} ${money(impact,true)}`).join(", ")}.</p>
+    <p>${money(item.cash)} от продажи СеверТеха остаются на счёте без процентов.</p>
+  </div>`;
+}
 
+function comparePage() {
+  const {baseline,preferred,sorted}=choices();
+  const maxChange=Math.max(1,...sorted.flatMap(item=>item.changes.map(change=>Math.abs(change))));
   return `<a class="back" href="#portfolio"><span aria-hidden="true">‹</span> К портфелю</a>
-    <div class="page-head"><div><h1>Сравнение вариантов</h1><p class="sub">${esc(
-      subtext
-    )}</p></div>${modeSelect()}</div>
-    <section class="card feature compare-feature">
-      <div><h2>${esc(data.banner.headline)}</h2><p>${esc(data.banner.subline)}</p></div>
-      ${pill(data.banner.pill_tone, data.banner.pill_label)}
+    <div class="page-head compare-page-head"><div><h1>Сравнение вариантов</h1></div><div class="compare-period"><span class="metric-name">Горизонт прогноза</span>${horizonPicker("horizon-compare")}</div></div>
+    <div class="compare-grid">${sorted.map(item=>{
+      const [largest]=Object.entries(item.amounts).reduce((a,b)=>a[1]>=b[1]?a:b);
+      const baseChange=item.changes[1];
+      const difference=sizes(baseChange-baseline.changes[1]);
+      const composition=[
+        ...Object.entries(item.amounts).map(([key,value])=>[key,assets[key].name,value]),
+        ["cash","Деньги",item.cash]
+      ].filter(([, ,value])=>value>0);
+      return `<section class="card option ${item===preferred?"leading":""}" aria-labelledby="option-${item.id}">
+      <h2 id="option-${item.id}">${item.title}</h2>
+      ${item===preferred?pill("warn","Первый вариант"):item.limit?pill("bad",item.concentrationLimit&&item.lossLimit?"Достигнуты оба лимита":item.concentrationLimit?"Лимит концентрации 45%":"Лимит убытка за месяц 10%"):pill("neutral",item.id==="hold"?"Исходный вариант":"В пределах лимитов")}
+      <div class="option-result">
+        <span>Портфель в базовом сценарии</span>
+        <strong>${money(item.total+baseChange)}</strong>
+        <small>${item===baseline?"Исходный вариант для сравнения":`${money(difference,true)} к исходному варианту`}</small>
+      </div>
+      <div class="option-composition">
+        <h3>Состав после действия</h3>
+        <div class="composition-strip" aria-hidden="true">${composition.map(([key,,value])=>`<span class="holding-${key}" style="flex-grow:${value}"></span>`).join("")}</div>
+        <ul class="composition-key">${composition.map(([key,name,value])=>`<li><i class="holding-${key}" aria-hidden="true"></i><span>${name}</span><strong>${percent(value/item.total*100)}</strong></li>`).join("")}</ul>
+      </div>
+      <dl aria-label="Итоговая стоимость портфеля по сценариям и крупнейшая доля">
+        ${series.map(({name},index)=>{
+          const change=item.changes[index];
+          const tone=change<0?"negative":change>0?"positive":"";
+          return `<div class="option-scenario${index===1?" base-scenario":""}"><dt>${name}</dt><dd>${money(item.total+change)} <small class="${tone}">${money(change,true)} (${percent(change/item.total*100,true)})</small></dd>
+            <span class="scenario-track ${tone}" aria-hidden="true"><i style="--change-width:${Math.abs(change)/maxChange*50}%"></i></span></div>`;
+        }).join("")}
+        <div><dt>Крупнейшая доля</dt><dd class="${item.concentrationLimit?"negative":""}">${percent(item.share)} <small>${assets[largest].name}</small></dd></div>
+      </dl>
+      <a class="button option-report-link" href="#report/${mode}/${horizon.days}/${item.id}" target="_blank" rel="noopener" aria-label="Подробнее: ${item.title} (новая вкладка)">Подробнее</a>
+    </section>`;}).join("")}</div>
+    `;
+}
+
+const reportDecisions = new Map();
+function reportDecisionKey() { return `${mode}/${horizon.days}/${currentRoute().optionId}`; }
+function reportDecisionText(value) {
+  return value === "confirm" ? "Вариант выбран в этом сеансе. Заявка на покупку не создаётся." : value === "reject" ? "Вариант отклонён в этом сеансе. Можно вернуться к сравнению или изменить выбор." : "Выбор относится только к учебному отчёту. Сделки не совершаются.";
+}
+
+function forecastReport(item) {
+  const {baseline,preferred}=choices();
+  const baseDifference=sizes(item.changes[1]-baseline.changes[1]);
+  const lossDifference=sizes(item.monthLoss-baseline.monthLoss);
+  const focusKeys=["add","hold","sell"].includes(item.id)?["A"]:["A","B"];
+  const changes=Object.entries(item.amounts).filter(([key,value])=>value!==modes[mode].amounts[key]);
+  const selected=reportDecisions.get(reportDecisionKey());
+  const differenceText=(value,more,less)=>value===0?"Без изменений":`${money(Math.abs(value))} ${value>0?more:less}`;
+  const status=item.limit?"Достигнут лимит риска":item.id===preferred?.id?"Первый по правилам сравнения":"В пределах лимитов";
+  return `<div class="report-page">
+    <a class="back" href="#compare"><span aria-hidden="true">‹</span> Все варианты</a>
+    <header class="page-head report-heading"><div><h1>${item.title}</h1><p class="sub">Разбор варианта для портфеля ${money(item.total)}</p></div>
+      <div class="report-period"><span class="metric-name">Срок сценария</span><strong>${horizon.term}</strong></div>
+    </header>
+    <section class="card report-overview" aria-labelledby="report-overview-title">
+      <div class="report-overview-head"><h2 id="report-overview-title">Что изменится</h2>${pill(item.limit?"bad":"neutral",status)}</div>
+      <div class="report-trade-list">${changes.length?changes.map(([key,value])=>`<div class="report-trade">
+        ${symbol(assets[key])}<div><strong>${assets[key].name}</strong><span>${value>modes[mode].amounts[key]?"Покупка":"Продажа"} на ${money(Math.abs(value-modes[mode].amounts[key]))}</span></div>
+        <div class="report-before-after"><span>Было ${money(modes[mode].amounts[key])}</span><strong>Станет ${money(value)}</strong></div>
+      </div>`).join(""):`<p>Состав бумаг остаётся прежним. ${item.cash>0?`${money(item.cash)} остаются на счёте без процентов.`:"Портфель сохраняется без покупок и продаж."}</p>`}</div>
+      <div class="report-cash"><span>Свободные деньги после действия</span><strong>${money(item.cash)}</strong></div>
+      <div class="report-key-results">
+        <div><span>Базовый результат за выбранный срок</span><strong>${money(item.changes[1],true)}</strong><small>Стоимость портфеля ${money(item.total+item.changes[1])}</small></div>
+        <div><span>К исходному варианту</span><strong>${money(baseDifference,true)}</strong><small>${mode==="topup"?"Если оставить деньги на счёте":"Если сохранить состав портфеля"}</small></div>
+        <div><span>Пессимистичный убыток за месяц</span><strong class="negative">${money(item.monthLoss)}</strong><small>${lossDifference===0?"Такой же, как в исходном варианте":differenceText(lossDifference,"больше","меньше")+" исходного убытка"}</small></div>
+      </div>
+      <p class="report-tradeoff">${item.limit?"Вариант достиг ограничения: проверьте лимиты перед выбором.":baseDifference>0&&lossDifference>0?`Дополнительный базовый результат ${money(baseDifference)} сопровождается ростом месячного сценарного убытка на ${money(lossDifference)}.`:item.id==="hold"?"Это исходный вариант, с которым сравниваются остальные действия.":"Сопоставьте изменение базового результата с убытком и долей крупнейшей позиции."}</p>
     </section>
-    <div class="compare-grid">${options
-      .map((item) => {
-        const calc = item.calculation;
-        const isPreferred = preferred && item.option_id === preferred.option_id;
-        const isBreached = calc.concentration_limit_breached || calc.loss_limit_breached;
-        return `<section class="card option ${isPreferred ? "leading" : ""} ${
-          isBreached ? "breached" : ""
-        }">
-          <h2>${esc(item.title)}</h2>
-          ${pill(item.limit_tone, item.limit_badge)}
-          <dl>
-            <div><dt>Оптимистичный</dt><dd class="positive">${esc(
-              calc.scenarios.optimistic.result_fmt
-            )} <small>${esc(calc.scenarios.optimistic.result_pct_fmt)}</small></dd></div>
-            <div><dt>Базовый</dt><dd>${esc(calc.scenarios.base.result_fmt)} <small>${esc(
-          calc.scenarios.base.result_pct_fmt
-        )}</small></dd></div>
-            <div><dt>Пессимистичный</dt><dd class="negative">${esc(
-              calc.scenarios.pessimistic.result_fmt
-            )} <small>${esc(calc.scenarios.pessimistic.result_pct_fmt)}</small></dd></div>
-            <div><dt>Крупнейшая доля</dt><dd class="${isBreached ? "negative" : ""}">${esc(
-          calc.largest_security_share_fmt
-        )}</dd></div>
-          </dl>
-          ${
-            item.ineligible_reasons.length > 0 && !item.is_baseline
-              ? `<p class="option-note">${esc(item.ineligible_reasons.join("; "))}</p>`
-              : ""
-          }
-          <button type="button" class="button ghost option-button" data-variant="${esc(
-            item.option_id
-          )}" aria-controls="comparison-detail" aria-pressed="${item.option_id === selected.option_id}">
-            ${item.option_id === selected.option_id ? "Разница показана" : "Показать разницу"}
-          </button>
-        </section>`;
-      })
-      .join("")}</div>
-    ${comparisonDetail(selected, baseline)}
-    ${renderCustomSandbox(data)}
-    <p class="footnote">Расчёты выполняются детерминированным модулем до налогов за 21 торговую сессию. Выплаты и комиссии учитываются по формуле Q-02.</p>`;
-}
-
-function drawChart(canvas, options, hidden = new Set()) {
-  const ratio = window.devicePixelRatio || 1;
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-  if (!width || !height) return [];
-  canvas.width = Math.round(width * ratio);
-  canvas.height = Math.round(height * ratio);
-  const context = canvas.getContext("2d");
-  context.scale(ratio, ratio);
-
-  const portfolio = options.kind === "portfolio";
-  const history = options.kind === "history";
-  const progress = [0, 0.14, 0.28, 0.4, 0.56, 0.68, 0.83, 1];
-  const pathNoise = [0, 0.02, -0.04, 0.05, -0.025, 0.055, -0.025, 0];
-
-  const lines = history
-    ? [options.values]
-    : options.values.map((delta, index) =>
-        progress.map((fraction, i) => {
-          const endChange = portfolio ? delta : (options.price * delta) / 100;
-          return (
-            options.price +
-            endChange * fraction +
-            Math.abs(endChange) * pathNoise[i] * (index === 1 ? 0.6 : 1)
-          );
-        })
-      );
-
-  const numbers = lines.flat();
-  const min = Math.min(...numbers);
-  const max = Math.max(...numbers);
-  const step = portfolio ? 5000 : Math.max(1, Math.ceil((max - min) / 4));
-  const floor = Math.floor((min - step * 0.2) / step) * step;
-  const ceil = Math.ceil((max + step * 0.15) / step) * step;
-  const left = portfolio ? 55 : 46;
-  const right = 12;
-  const top = 12;
-  const bottom = 25;
-  const plotWidth = width - left - right;
-  const plotHeight = height - top - bottom;
-  const x = (i, count) => left + (i * plotWidth) / (count - 1);
-  const y = (value) => top + ((ceil - value) * plotHeight) / Math.max(1, ceil - floor);
-
-  context.font = "12px " + getComputedStyle(canvas).fontFamily;
-  context.textAlign = "right";
-  context.textBaseline = "middle";
-  for (let value = floor; value <= ceil; value += step) {
-    const ordinate = y(value);
-    context.strokeStyle = "#e6eaf0";
-    context.lineWidth = 1;
-    context.beginPath();
-    context.moveTo(left, ordinate);
-    context.lineTo(width - right, ordinate);
-    context.stroke();
-    context.fillStyle = "#596271";
-    context.fillText(
-      portfolio ? value / 1000 + " тыс." : value.toLocaleString("ru-RU") + " ₽",
-      left - 8,
-      ordinate
-    );
-  }
-
-  const labels = history
-    ? ["Начало", "Середина", "Последняя"]
-    : width < 380
-    ? ["Сегодня", "7", "14", "21 сессия"]
-    : ["Сегодня", "7 сессий", "14 сессий", "21 сессия"];
-
-  context.fillStyle = "#596271";
-  labels.forEach((label, index) => {
-    context.textAlign =
-      index === 0 ? "left" : index === labels.length - 1 ? "right" : "center";
-    context.fillText(label, left + (index * plotWidth) / (labels.length - 1), height - 9);
-  });
-
-  const points = [];
-  lines.forEach((values, index) => {
-    if (hidden.has(index)) return;
-    const style = history ? { color: "#222a37", dash: [] } : SERIES_META[index];
-    const coordinates = values.map((value, i) => ({ x: x(i, values.length), y: y(value), value }));
-    if (history) {
-      const fill = context.createLinearGradient(0, top, 0, height - bottom);
-      fill.addColorStop(0, "#e3eaf8");
-      fill.addColorStop(1, "#f9fbff");
-      context.beginPath();
-      coordinates.forEach((p, i) => (i ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y)));
-      context.lineTo(coordinates.at(-1).x, height - bottom);
-      context.lineTo(coordinates[0].x, height - bottom);
-      context.closePath();
-      context.fillStyle = fill;
-      context.fill();
-    }
-    context.beginPath();
-    context.strokeStyle = style.color;
-    context.lineWidth = 2.6;
-    context.setLineDash(style.dash);
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    coordinates.forEach((p, i) => (i ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y)));
-    context.stroke();
-    context.setLineDash([]);
-    const end = coordinates.at(-1);
-    context.beginPath();
-    context.arc(end.x, end.y, 3.6, 0, Math.PI * 2);
-    context.fillStyle = style.color;
-    context.fill();
-    points.push(...coordinates.map((p) => ({ ...p, label: history ? "Цена" : style.name })));
-  });
-
-  return points;
-}
-
-function bindChart(options) {
-  state.chartObserver?.disconnect();
-  const canvas = document.querySelector("#chart");
-  const tooltip = document.querySelector("#chart-tip");
-  if (!canvas || !tooltip) return;
-  const hidden = new Set();
-  let points = [];
-  const repaint = () => {
-    points = drawChart(canvas, options, hidden);
-    tooltip.hidden = true;
-  };
-  state.chartObserver = new ResizeObserver(repaint);
-  state.chartObserver.observe(canvas);
-  repaint();
-
-  document.querySelectorAll("[data-series]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const index = Number(button.dataset.series);
-      if (hidden.has(index)) hidden.delete(index);
-      else if (hidden.size < 2) hidden.add(index);
-      button.setAttribute("aria-pressed", String(!hidden.has(index)));
-      repaint();
-    })
-  );
-
-  canvas.addEventListener("pointermove", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-    const point = points.reduce(
-      (best, item) =>
-        !best || Math.hypot(item.x - px, item.y - py) < Math.hypot(best.x - px, best.y - py)
-          ? item
-          : best,
-      null
-    );
-    if (!point || Math.hypot(point.x - px, point.y - py) > 22) {
-      tooltip.hidden = true;
-      return;
-    }
-    tooltip.textContent = point.label + " · " + formatMoneyClient(point.value);
-    tooltip.hidden = false;
-    tooltip.style.left =
-      Math.max(0, Math.min(point.x + 10, rect.width - tooltip.offsetWidth)) + "px";
-    tooltip.style.top = Math.max(0, point.y - 30) + "px";
-  });
-
-  canvas.addEventListener("pointerleave", () => {
-    tooltip.hidden = true;
-  });
+    <nav class="report-index" aria-label="Разделы отчёта">
+      ${[["risk","Риск"],["forecast","Сценарии"],["evidence","Обоснование"],["decision","Выбор варианта"]].map(([id,label])=>`<button type="button" data-report-section="report-${id}">${label}</button>`).join("")}
+    </nav>
+    <section class="card report-section" id="report-risk" tabindex="-1">
+      <div class="report-section-head"><h2>Риск после действия</h2><span class="metric-name">Лимиты проверяются за месяц</span></div>
+      <div class="report-risk-grid">
+        <div><div class="report-risk-value"><h3>Сценарный убыток</h3><strong>${percent(item.monthLoss/item.total*100)}</strong></div>
+          ${limitChart(item.monthLoss/item.total*100,10,Math.max(15,item.monthLoss/item.total*100),"#ad3449","Убыток за месяц")}
+          <p>${item.lossLimit?"Лимит 10% достигнут":"До лимита 10% остаётся "+money(item.total*.1-item.monthLoss)}</p></div>
+        <div><div class="report-risk-value"><h3>Крупнейшая позиция</h3><strong>${percent(item.share)}</strong></div>
+          ${limitChart(item.share,45,Math.max(60,item.share),"#567cb1","Крупнейшая доля")}
+          <p>${item.concentrationLimit?"Лимит 45% достигнут":"До лимита 45% остаётся "+percent(45-item.share).replace("%"," п. п.")}</p></div>
+      </div>
+      <p class="report-note">В пределах лимитов не означает без риска. Убыток рассчитан по учебному сценарию.</p>
+    </section>
+    <section class="report-section" id="report-forecast" tabindex="-1" aria-label="Сценарии портфеля">
+      ${chartFrame("Что может произойти с портфелем",`${horizon.term}. Начальная стоимость ${money(item.total)}`,item.changes,"portfolio",item.total)}
+      <div class="report-scenario-table" role="table" aria-label="Стоимость портфеля по сценариям">
+        <div class="report-scenario-row report-table-head" role="row"><span role="columnheader">Сценарий</span><span role="columnheader">Стоимость в конце</span><span role="columnheader">Изменение</span></div>
+        ${series.map(({name},index)=>`<div class="report-scenario-row ${index===1?"report-base-row":""}" role="row"><span role="rowheader">${name}</span><strong role="cell">${money(item.total+item.changes[index])}</strong><span role="cell" class="${item.changes[index]<0?"negative":"positive"}">${money(item.changes[index],true)}<small>${percent(item.changes[index]/item.total*100,true)}</small></span></div>`).join("")}
+      </div>
+      <details class="report-disclosure"><summary>Расчёт по каждой бумаге</summary>
+        <div class="report-detail-body">${series.map(({name},index)=>`<section class="report-calculation"><h3>${name} сценарий</h3><ul>${scenarioContributions(item.amounts,index).map(([label,amount,rate,impact])=>`<li><span>${label}<small>${money(amount)} × ${percent(rate,true)}</small></span><strong>${money(impact,true)}</strong></li>`).join("")}</ul><p>Итого изменение: <strong>${money(item.changes[index],true)}</strong></p></section>`).join("")}</div>
+      </details>
+    </section>
+    <section class="card report-section" id="report-evidence" tabindex="-1">
+      <h2>На чём основана оценка</h2>
+      <p class="report-note">Отчётность и новости объясняют риски. Числа сценариев заданы в учебной модели и не меняются автоматически из-за новостей.</p>
+      <div class="report-evidence-grid">${focusKeys.map(key=>`<article><h3>${assets[key].name}</h3><p>${issuerTakeaway(assets[key],key)}</p>
+        <dl class="report-facts">${assets[key].stats.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join("")}</dl></article>`).join("")}</div>
+      <details class="report-disclosure"><summary>Новости и учебные источники</summary><div class="report-detail-body">
+        ${focusKeys.flatMap(key=>assets[key].events.map(([title,type,impact,source])=>`<article class="report-news-item"><span class="metric-name">${assets[key].name} · ${type}</span><h3>${title}</h3><p>${impact}</p><p class="report-note"><strong>Учебный источник:</strong> ${source}</p></article>`)).join("")}
+      </div></details>
+      <details class="report-disclosure"><summary>Методика и правила сравнения</summary><div class="report-detail-body">
+        <p>В бумагах ${money(item.total-item.cash)}, на счёте ${money(item.cash)}. Деньги на счёте сохраняют стоимость.</p>
+        <p>Доходность каждой бумаги за месяц умножается на ${horizon.days}/21, затем на сумму позиции. Сумма вкладов даёт изменение стоимости портфеля. Округление производится до копеек.</p>
+        <p>${mode==="review"?"Сначала проверяются лимиты. Альтернатива должна уменьшить убыток или крупнейшую долю. Допустимые варианты упорядочены по убытку, затем по доле.":"Сначала проверяются лимиты. Покупка должна улучшать базовый результат относительно хранения денег на счёте. Среди допустимых вариантов первым идёт вариант с наибольшим базовым результатом."}</p>
+        ${item.id==="sell"?saleExample(item):""}
+      </div></details>
+    </section>
+    <section class="card report-section report-decision" id="report-decision" tabindex="-1" aria-labelledby="report-decision-title">
+      <div><h2 id="report-decision-title">Ваш выбор</h2><p>${item.title}</p><p class="report-note" role="status" data-report-status>${reportDecisionText(selected)}</p></div>
+      <div class="report-actions"><button class="button" type="button" data-report-decision="confirm" aria-pressed="${selected==="confirm"}">Выбрать вариант</button><button class="button secondary" type="button" data-report-decision="reject" aria-pressed="${selected==="reject"}">Отклонить вариант</button><a class="report-compare-link" href="#compare">Вернуться к сравнению</a></div>
+    </section>
+  </div>`;
 }
 
 function currentRoute() {
-  const [page, key] = location.hash.slice(1).split("/");
-  if (page === "asset") return { page: "asset", key: key || "A" };
-  if (page === "compare") return { page: "compare", key: key || null };
-  return { page: "portfolio", key: null };
+  const [page,key,view,optionId]=location.hash.slice(1).split("/");
+  if(page==="report" && Object.hasOwn(modes,key) && Object.hasOwn(horizons,view)){
+    return {page,mode:key,days:view,optionId};
+  }
+  if(page==="asset" && Object.hasOwn(assets,key)) return {page,key,tab:view==="scenarios"?view:"history"};
+  if(page==="compare") return {page};
+  return {page:"portfolio"};
 }
 
-async function render(resetFocus = false) {
-  if (state.portfolios.length === 0) {
-    try {
-      const listResp = await apiGet("/api/portfolios");
-      state.portfolios = listResp.portfolios || [];
-      if (state.portfolios.length > 0 && !state.portfolios.some((p) => p.portfolio_id === state.portfolioId)) {
-        state.portfolioId = state.portfolios[0].portfolio_id;
-      }
-    } catch (err) {
-      main.innerHTML = `<section class="card data-alert is-warn"><div><h2>Нет связи с расчётным сервером VIRA</h2><p>${esc(
-        err.message
-      )}</p></div></section>`;
-      return;
-    }
+function render(resetFocus=false) {
+  const route=currentRoute();
+  let reportItem;
+  if(route.page==="report"){
+    mode=route.mode;
+    horizon=horizons[route.days];
+    reportItem=choices().sorted.find(item=>item.id===route.optionId);
+    if(!reportItem) route.page="compare";
   }
-
-  const route = currentRoute();
-  if (state.lastRoute !== location.hash) {
-    state.tab = "history";
-    state.newsFilter = "all";
+  if(lastRoute!==location.hash){
+    tab=route.tab??"history";
+    newsFilter="all";
   }
-  state.lastRoute = location.hash;
-  state.chart = null;
-  state.chartObserver?.disconnect();
-
-  document.querySelectorAll("[data-nav]").forEach((node) => {
-    if (node.dataset.nav === route.page) node.setAttribute("aria-current", "page");
+  lastRoute=location.hash;
+  chart=null;
+  chartObserver?.disconnect();
+  document.querySelectorAll("[data-nav]").forEach(node=>{
+    if(node.dataset.nav===route.page) node.setAttribute("aria-current","page");
     else node.removeAttribute("aria-current");
   });
-
-  try {
-    let data;
-    if (route.page === "asset") {
-      data = await apiGet(
-        `/api/portfolios/${encodeURIComponent(state.portfolioId)}/assets/${encodeURIComponent(
-          route.key
-        )}`
-      );
-      document.title = `VIRA — ${data.asset.name}`;
-      main.innerHTML = renderAssetPage(data);
-    } else if (route.page === "compare") {
-      const qs = route.key ? `?target=${encodeURIComponent(route.key)}` : "";
-      data = await apiGet(
-        `/api/portfolios/${encodeURIComponent(state.portfolioId)}/compare${qs}`
-      );
-      document.title = "VIRA — Сравнение вариантов";
-      main.innerHTML = renderComparePage(data);
-    } else {
-      data = await apiGet(`/api/portfolios/${encodeURIComponent(state.portfolioId)}/overview`);
-      document.title = "VIRA — Прогноз портфеля";
-      main.innerHTML = renderOverview(data);
-    }
-    updateTraceFooter(data.trace);
-    if (state.chart) bindChart(state.chart);
-    if (resetFocus) {
-      window.scrollTo(0, 0);
-      const h1 = main.querySelector("h1");
-      if (h1) {
-        h1.setAttribute("tabindex", "-1");
-        h1.focus({ preventScroll: true });
-      }
-    }
-  } catch (err) {
-    main.innerHTML = `<section class="card data-alert is-warn"><div><h2>Ошибка загрузки данных</h2><p>${esc(
-      err.message
-    )}</p></div></section>`;
+  const titles={portfolio:"Прогноз портфеля",asset:route.key?assets[route.key].name:"Карточка бумаги",compare:"Сравнение вариантов"};
+  document.title="VIRA — "+(reportItem?.title??titles[route.page]);
+  main.innerHTML=reportItem?forecastReport(reportItem):route.page==="asset"?assetPage(route.key):route.page==="compare"?comparePage():overview();
+  if(chart) bindChart(chart);
+  if(resetFocus){
+    window.scrollTo(0,0);
+    main.querySelector("h1").setAttribute("tabindex","-1");
+    main.querySelector("h1").focus({preventScroll:true});
   }
 }
 
-main.addEventListener("change", async (event) => {
-  if (event.target.id === "mode") {
-    state.portfolioId = event.target.value;
-    state.selectedVariant = null;
-    state.customSim = null;
-    await render();
-    document.querySelector("#mode")?.focus();
+function drawChart(canvas,options,hidden=new Set()) {
+  const ratio=window.devicePixelRatio||1;
+  const width=canvas.clientWidth, height=canvas.clientHeight;
+  if(!width||!height) return [];
+  canvas.width=Math.round(width*ratio);
+  canvas.height=Math.round(height*ratio);
+  const context=canvas.getContext("2d");
+  context.scale(ratio,ratio);
+  const portfolio=options.kind==="portfolio";
+  const history=options.kind==="history";
+  const lines=history?[options.values]:options.values.map(delta=>{
+    const endChange=portfolio?delta:options.price*delta/100;
+    return Array.from({length:options.days+1},(_,day)=>options.price+endChange*day/options.days);
+  });
+  const numbers=lines.flat();
+  const min=Math.min(...numbers),max=Math.max(...numbers);
+  const targetStep=(max-min)/4||1;
+  const unit=10**Math.floor(Math.log10(targetStep));
+  const step=history?Math.max(1,Math.ceil(targetStep)):[1,2,5,10].find(scale=>scale>=targetStep/unit)*unit;
+  const floorTick=Math.floor((min-step*.2)/step);
+  const ceilTick=Math.ceil((max+step*.15)/step);
+  const left=portfolio?67:54,right=12,top=12,bottom=25;
+  const plotWidth=width-left-right,plotHeight=height-top-bottom;
+  const x=(i,count)=>left+i*plotWidth/(count-1);
+  const y=value=>top+(ceilTick-value/step)*plotHeight/(ceilTick-floorTick);
+  context.font="12px "+getComputedStyle(canvas).fontFamily;
+  context.textAlign="right";
+  context.textBaseline="middle";
+  for(let tick=floorTick;tick<=ceilTick;tick++){
+    const value=tick*step;
+    const ordinate=y(value);
+    context.strokeStyle="#e6eaf0";
+    context.lineWidth=1;
+    context.beginPath();context.moveTo(left,ordinate);context.lineTo(width-right,ordinate);context.stroke();
+    context.fillStyle="#596271";
+    const axisLabel=portfolio?(value/1000).toLocaleString("ru-RU")+" тыс.":money(value);
+    context.fillText(axisLabel,left-8,ordinate);
   }
-});
-
-main.addEventListener("submit", async (event) => {
-  if (event.target.id !== "sandbox-form") return;
-  event.preventDefault();
-  const fd = new FormData(event.target);
-  state.customForm = {
-    action: String(fd.get("action")),
-    target_key: String(fd.get("target_key")),
-    replacement_key: String(fd.get("replacement_key")),
-    sell_share_pct: String(fd.get("sell_share_pct") || "100"),
-    commission_rate_bps: String(fd.get("commission_rate_bps") || "0"),
-  };
-  try {
-    state.customSim = await apiPost("/api/simulate", {
-      portfolio_id: state.portfolioId,
-      action: state.customForm.action,
-      target_key: state.customForm.target_key,
-      replacement_key: state.customForm.replacement_key,
-      sell_share_pct: state.customForm.sell_share_pct,
-      commission_rate_bps: state.customForm.commission_rate_bps,
-    });
-    await render();
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-main.addEventListener("click", async (event) => {
-  const tabButton = event.target.closest("[data-tab]");
-  if (tabButton) {
-    state.tab = tabButton.dataset.tab;
-    await render();
-    document.querySelector(`[data-tab="${state.tab}"]`)?.focus({ preventScroll: true });
-    return;
-  }
-  const filterButton = event.target.closest("[data-news-filter]");
-  if (filterButton) {
-    state.newsFilter = filterButton.dataset.newsFilter;
-    await render();
-    document.querySelector(`[data-news-filter="${state.newsFilter}"]`)?.focus({ preventScroll: true });
-    return;
-  }
-  const variantButton = event.target.closest("[data-variant]");
-  if (variantButton) {
-    state.selectedVariant = variantButton.dataset.variant;
-    await render();
-    document.querySelector("#difference-title")?.focus();
-    return;
-  }
-  const refreshNewsBtn = event.target.closest('[data-action="refresh-news"]');
-  if (refreshNewsBtn) {
-    state.newsLoading = true;
-    state.newsError = "";
-    await render();
-    try {
-      await apiPost("/api/news/refresh", { include_tier3: false });
-    } catch (err) {
-      state.newsError = err.message;
-    } finally {
-      state.newsLoading = false;
-      await render();
-      document.querySelector('[data-action="refresh-news"]')?.focus({ preventScroll: true });
+  const axisDays={1:[0,1],7:[0,3,7],21:[0,7,14,21]};
+  const historyLabels=options.days===1?[[0,"Вчера"],[1,"Сегодня"]]:[[0,options.days+" дн. назад"],[.5,Math.round(options.days/2)+" дн. назад"],[1,"Сегодня"]];
+  const labels=history?historyLabels:axisDays[options.days].map(day=>[
+    day/options.days,day===0?"Сегодня":width<380&&day!==options.days?String(day):`${day}-й день`
+  ]);
+  context.fillStyle="#596271";
+  labels.forEach(([fraction,label])=>{
+    context.textAlign=fraction===0?"left":fraction===1?"right":"center";
+    context.fillText(label,left+fraction*plotWidth,height-9);
+  });
+  const points=[];
+  lines.forEach((values,index)=>{
+    if(hidden.has(index)) return;
+    const style=history?{color:"#222a37",dash:[]}:series[index];
+    const coordinates=values.map((value,i)=>({x:x(i,values.length),y:y(value),value}));
+    if(history){
+      const fill=context.createLinearGradient(0,top,0,height-bottom);
+      fill.addColorStop(0,"#e3eaf8");fill.addColorStop(1,"#f9fbff");
+      context.beginPath();
+      coordinates.forEach((p,i)=>i?context.lineTo(p.x,p.y):context.moveTo(p.x,p.y));
+      context.lineTo(coordinates.at(-1).x,height-bottom);context.lineTo(coordinates[0].x,height-bottom);
+      context.closePath();context.fillStyle=fill;context.fill();
     }
+    context.beginPath();context.strokeStyle=style.color;context.lineWidth=2.6;
+    context.setLineDash(style.dash);context.lineCap="round";context.lineJoin="round";
+    coordinates.forEach((p,i)=>i?context.lineTo(p.x,p.y):context.moveTo(p.x,p.y));
+    context.stroke();context.setLineDash([]);
+    const end=coordinates.at(-1);
+    context.beginPath();context.arc(end.x,end.y,3.6,0,Math.PI*2);context.fillStyle=style.color;context.fill();
+    points.push(...coordinates.map(p=>({...p,label:history?"Цена":style.name})));
+  });
+  return points;
+}
+
+let chartObserver;
+function bindChart(options) {
+  chartObserver?.disconnect();
+  const canvas=document.querySelector("#chart");
+  const tooltip=document.querySelector("#chart-tip");
+  const hidden=new Set();
+  let points=[];
+  const repaint=()=>{points=drawChart(canvas,options,hidden);tooltip.hidden=true;};
+  chartObserver=new ResizeObserver(repaint);
+  chartObserver.observe(canvas);
+  repaint();
+  document.querySelectorAll("[data-series]").forEach(button=>button.addEventListener("click",()=>{
+    const index=Number(button.dataset.series);
+    if(hidden.has(index)) hidden.delete(index);
+    else if(hidden.size<2) hidden.add(index);
+    button.setAttribute("aria-pressed",String(!hidden.has(index)));
+    repaint();
+  }));
+  canvas.addEventListener("pointermove",event=>{
+    const rect=canvas.getBoundingClientRect();
+    const px=event.clientX-rect.left,py=event.clientY-rect.top;
+    const point=points.reduce((best,item)=>!best||Math.hypot(item.x-px,item.y-py)<Math.hypot(best.x-px,best.y-py)?item:best,null);
+    if(!point||Math.hypot(point.x-px,point.y-py)>22){tooltip.hidden=true;return;}
+    tooltip.textContent=point.label+" · "+money(point.value);
+    tooltip.hidden=false;
+    tooltip.style.left=Math.max(0,Math.min(point.x+10,rect.width-tooltip.offsetWidth))+"px";
+    tooltip.style.top=Math.max(0,point.y-30)+"px";
+  });
+  canvas.addEventListener("pointerleave",()=>{tooltip.hidden=true;});
+}
+
+main.addEventListener("click",event=>{
+  const sectionLink=event.target.closest("[data-report-section]");
+  if(sectionLink){
+    const section=document.getElementById(sectionLink.dataset.reportSection);
+    section.focus({preventScroll:true});
+    section.scrollIntoView({block:"start"});
     return;
   }
-  const sourceBtn = event.target.closest("[data-source]");
-  if (!sourceBtn) return;
-  const srcId = sourceBtn.dataset.source;
-  const src = state.currentSources[srcId];
-  if (!src) return;
-  state.opener = sourceBtn;
-  const externalLink =
-    src.url && /^https?:\/\//i.test(src.url)
-      ? `<a class="button" href="${esc(src.url)}" target="_blank" rel="noopener noreferrer">Перейти к публикации</a>`
-      : "";
-  dialog.innerHTML = `<h2 id="source-title">${esc(src.title)}</h2>
-    <div class="source-meta">${esc(src.kind)} · ${esc(src.published_at)}</div>
-    <p>${esc(src.excerpt)}</p>
-    <div class="source-actions">${externalLink}<form method="dialog"><button class="button secondary" type="submit">Закрыть</button></form></div>`;
+  const decision=event.target.closest("[data-report-decision]");
+  if(decision){
+    main.querySelectorAll("[data-report-decision]").forEach(button=>{
+      button.setAttribute("aria-pressed",String(button===decision));
+    });
+    reportDecisions.set(reportDecisionKey(),decision.dataset.reportDecision);
+    main.querySelector("[data-report-status]").textContent=reportDecisionText(decision.dataset.reportDecision);
+    return;
+  }
+  const horizonButton=event.target.closest("[data-horizon]");
+  if(horizonButton){
+    const period=horizons[horizonButton.dataset.horizon];
+    if(period===horizon) return;
+    const pickerId=horizonButton.closest(".horizon-picker").id;
+    horizon=period;
+    render();
+    document.querySelector(`#${pickerId} [data-horizon="${period.days}"]`).focus({preventScroll:true});
+    return;
+  }
+  const tabButton=event.target.closest("[data-tab]");
+  if(tabButton){
+    tab=tabButton.dataset.tab;
+    render();
+    document.querySelector('[data-tab="'+tab+'"]').focus({preventScroll:true});
+  }
+  const filterButton=event.target.closest("[data-news-filter]");
+  if(filterButton){
+    newsFilter=filterButton.dataset.newsFilter;
+    render();
+    document.querySelector('[data-news-filter="'+newsFilter+'"]').focus({preventScroll:true});
+    return;
+  }
+  const source=event.target.closest("[data-source]");
+  if(!source) return;
+  const item=assets[currentRoute().key];
+  if(!item) return;
+  const report=source.dataset.source==="report";
+  const news=item.events[Number(source.dataset.source)];
+  opener=source;
+  dialog.innerHTML=`<h2 id="source-title">${report?"Учебный отчёт · "+item.name:news[0]}</h2>
+    <p>${report?item.stats.map(([name,value])=>name+" — "+value).join(". ")+". Данные заданы для проверки макета.":news[3]}</p>
+    <form method="dialog"><button class="button secondary" type="submit">Закрыть</button></form>`;
   dialog.showModal();
 });
-
-dialog.addEventListener("close", () => {
-  state.opener?.focus();
-  state.opener = null;
-});
-
-window.addEventListener("hashchange", () => render(true));
+dialog.addEventListener("close",()=>{opener?.focus();opener=null;});
+window.addEventListener("hashchange",()=>render(true));
 render();

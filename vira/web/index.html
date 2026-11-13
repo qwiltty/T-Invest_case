@@ -17,19 +17,71 @@
         <span>VIRA</span>
       </a>
       <span class="product-name">Портфельная аналитика</span>
-      <span class="demo-note" id="header-badge"><span aria-hidden="true"></span>Учебные данные · API</span>
+      <span class="demo-note"><span aria-hidden="true"></span>Учебные данные</span>
+      <button id="open-trailer-btn" type="button" style="display:inline-flex; align-items:center; gap:6px; background:#ffdd2d; color:#1c2024; border:1px solid rgba(0,0,0,0.06); padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-left:12px; transition:opacity .15s ease;">
+        <span aria-hidden="true">▶</span> Видео-трейлер
+      </button>
     </div>
-    <nav class="shell nav" aria-label="Разделы VIRA">
-      <a data-nav="portfolio" href="#portfolio">Прогноз портфеля</a>
-      <a data-nav="asset" href="#asset/A">Карточка бумаги</a>
-      <a data-nav="compare" href="#compare">Сравнение вариантов</a>
-    </nav>
   </header>
   <main class="shell" id="main" tabindex="-1"></main>
   <footer class="shell footer">
     <span>VIRA</span>
-    <span id="trace-meta">Веб-MVP на проверяемом расчётном модуле · Учебные данные</span>
+    <button type="button" onclick="document.getElementById('open-trailer-btn').click()" style="background:none; border:none; color:inherit; font-size:12px; cursor:pointer; opacity:0.8; text-decoration:underline;">🎬 Смотреть видео-демонстрацию (MP4)</button>
   </footer>
   <dialog id="source-dialog" aria-labelledby="source-title"></dialog>
+
+  <!-- Диалог видео-трейлера VIRA -->
+  <dialog id="trailer-dialog" aria-label="Видео-трейлер VIRA" style="max-width:840px; width:92%; border:none; border-radius:16px; padding:20px; box-shadow:0 16px 48px rgba(0,0,0,0.28); background:#ffffff; margin:auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#ffdd2d;"></span>
+        <h3 style="margin:0; font-size:17px; font-weight:700; color:#1c2024;">Видео-трейлер VIRA (Интеллектуальный агент Т-Инвестиций)</h3>
+      </div>
+      <button id="close-trailer-btn" type="button" style="background:none; border:none; font-size:26px; cursor:pointer; color:#6c7682; line-height:1; padding:0 4px;" aria-label="Закрыть">&times;</button>
+    </div>
+    <video id="trailer-video" src="/TRAILER_VIRA.mp4" controls preload="metadata" style="width:100%; border-radius:10px; background:#000; max-height:70vh; display:block;">
+      <source src="/TRAILER_VIRA.mp4" type="video/mp4">
+      <source src="../../TRAILER_VIRA.mp4" type="video/mp4">
+    </video>
+    <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:13px; color:#62666e;">
+      <span>Демонстрация 3 экранов: прогноз портфеля, карточка актива и сценарное сравнение</span>
+      <div style="display:flex; gap:12px;">
+        <a href="TRAILER_VIRA.mp4" target="_blank" style="color:#1c2024; font-weight:600; text-decoration:none;">↗ Открыть в новой вкладке</a>
+        <a href="TRAILER_VIRA.mp4" download style="color:#1c2024; font-weight:600; text-decoration:none;">⬇ Скачать MP4 (26 МБ)</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    (function() {
+      const openBtn = document.getElementById('open-trailer-btn');
+      const dialog = document.getElementById('trailer-dialog');
+      const closeBtn = document.getElementById('close-trailer-btn');
+      const video = document.getElementById('trailer-video');
+      if (openBtn && dialog) {
+        openBtn.addEventListener('click', function() {
+          if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+            if (video) video.play().catch(function() {});
+          } else {
+            window.open('TRAILER_VIRA.mp4', '_blank');
+          }
+        });
+      }
+      if (closeBtn && dialog) {
+        closeBtn.addEventListener('click', function() {
+          dialog.close();
+        });
+      }
+      if (dialog) {
+        dialog.addEventListener('close', function() {
+          if (video) video.pause();
+        });
+        dialog.addEventListener('click', function(e) {
+          if (e.target === dialog) dialog.close();
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
