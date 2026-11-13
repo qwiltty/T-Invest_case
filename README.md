@@ -1,4 +1,4 @@
-[Интерактивный веб-прототип (Live Demo)](https://qwiltty.github.io/T-Invest_case/) | [Видео-трейлер в браузере (MP4, 2 мин)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4) | [Итоговый отчёт для жюри (PDF)](VIRA_Report.pdf)
+[Интерактивный веб-прототип (Live Demo)](https://qwiltty.github.io/T-Invest_case/) | [Видео-трейлер в браузере](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4) | [Итоговый отчёт для жюри (PDF)](VIRA_Report.pdf)
 
 # VIRA: Virtual Investing Researcher Agent
 ### Интеллектуальная система анализа портфельного риска, сценарного прогнозирования и проверки первоисточников в экосистеме Т-Инвестиций
