@@ -14,6 +14,7 @@
 ---
 
 ## 🎬 Видео-демонстрация системы (Трейлер VIRA)
+https://github.com/qwiltty/T-Invest_case/issues/1
 
 [![Смотреть видео-трейлер VIRA](preview.png)](https://qwiltty.github.io/T-Invest_case/TRAILER_VIRA.mp4)
 
